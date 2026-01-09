@@ -11,7 +11,7 @@ public:
         for (char c = 'a'; c <= 'z'; ++c) ALLOWED_CHARACTERS.insert(c);
         for (char c = 'A'; c <= 'Z'; ++c) ALLOWED_CHARACTERS.insert(c);
     }
-    std::vector<std::string> get_next_words(
+    std::vector<std::tuple<std::string, size_t>> get_next_words(
         std::string& text, 
         size_t start_idx, 
         int num_of_next_words
