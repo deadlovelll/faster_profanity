@@ -1,9 +1,9 @@
-#include "word_finder.hpp"
+#include "word_finder/word_finder.hpp"
 #include <cstddef>
 #include <vector>
 
 std::vector<std::tuple<std::string, size_t>> WordFinder::get_next_words(
-    std::string& text,
+    std::string &text, 
     size_t start_idx,
     int num_of_next_words
 ) {
@@ -13,7 +13,7 @@ std::vector<std::tuple<std::string, size_t>> WordFinder::get_next_words(
     // return placeholder results with empty strings
     if (start_idx_of_next_word >= text.size() - 1) {
         std::vector<std::tuple<std::string, size_t>> result = {
-            {"", start_idx_of_next_word},
+            {"", start_idx_of_next_word}, 
             {"", start_idx_of_next_word}
         };
         return result;
@@ -33,7 +33,7 @@ std::vector<std::tuple<std::string, size_t>> WordFinder::get_next_words(
     // 1) the raw next word
     // 2) the concatenated prefix + next word
     std::vector<std::tuple<std::string, size_t>> words = {
-        nw_tuple,
+        nw_tuple, 
         {concatenated, end_index}
     };
     // If more words are requested, recursively collect them
@@ -42,7 +42,7 @@ std::vector<std::tuple<std::string, size_t>> WordFinder::get_next_words(
         std::vector<std::tuple<std::string, size_t>> next_words = get_next_words(
             text, 
             start_idx, 
-            num_of_next_words -1
+            num_of_next_words - 1
         );
         // Append all recursively obtained words to the current result
         words.insert(words.end(), next_words.begin(), next_words.end());
@@ -52,7 +52,7 @@ std::vector<std::tuple<std::string, size_t>> WordFinder::get_next_words(
 }
 
 size_t WordFinder::get_start_index_of_next_word(
-    std::string& text, 
+    std::string &text,
     size_t start_idx
 ) {
     // Getting the size of current text
@@ -74,10 +74,10 @@ size_t WordFinder::get_start_index_of_next_word(
 }
 
 std::tuple<std::string, size_t> WordFinder::get_next_word_and_end_index(
-    std::string& text, 
+    std::string &text, 
     size_t start_idx
 ) {
-    // Initializing empty string 
+    // Initializing empty string
     std::string next_word = "";
     // Getting the size of current text
     size_t start_index_of_next_word = text.size();
@@ -89,7 +89,7 @@ std::tuple<std::string, size_t> WordFinder::get_next_word_and_end_index(
         char character = text[index];
         // Skip characters that are not in the allowed set
         if (ALLOWED_CHARACTERS.find(character) == ALLOWED_CHARACTERS.end()) {
-            continue;
+            break;
         }
         // Adding charcter to the word
         next_word += character;
