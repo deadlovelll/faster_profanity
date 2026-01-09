@@ -26,6 +26,8 @@ add_executable(faster_profanity
 )
 
 target_link_libraries(faster_profanity
+    PUBLIC
+        nlohmann_json::nlohmann_json
     PRIVATE
         faster_profanity_lib
 )
@@ -34,8 +36,13 @@ FetchContent_Declare(
   googletest
   URL https://github.com/google/googletest/archive/refs/heads/main.zip
 )
+FetchContent_Declare(
+  nlohmann_json
+  URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
+)
 
 FetchContent_MakeAvailable(googletest)
+FetchContent_MakeAvailable(nlohmann_json)
 
 enable_testing()
 add_subdirectory(tests)

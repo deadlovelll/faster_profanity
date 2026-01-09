@@ -5,17 +5,12 @@
 class WordFinder {
 public:
     // Set of characters that are considered valid word characters
-    std::unordered_set<char> ALLOWED_CHARACTERS;
+    std::unordered_set<char32_t> ALLOWED_CHARACTERS;
 
     // Default constructor.
     // Initializes the set of allowed characters with ASCII letters [a-zA-Z].
     WordFinder() {
-        const char symbols[] = { '@', '$', '*', '"', '\'' };
-
-        for (char c = 'a'; c <= 'z'; ++c) ALLOWED_CHARACTERS.insert(c);
-        for (char c = 'A'; c <= 'Z'; ++c) ALLOWED_CHARACTERS.insert(c);
-        for (char c = '0'; c <= '9'; ++c) ALLOWED_CHARACTERS.insert(c);
-        for (char c : symbols) ALLOWED_CHARACTERS.insert(c);
+        
     }
 
     /**
