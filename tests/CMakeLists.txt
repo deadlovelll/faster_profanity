@@ -7,7 +7,7 @@ if(TEST_SOURCES)
 
     target_link_libraries(word_finder_tests
         PRIVATE
-            faster_profanity_lib
+            faster_profanity_lib  
             gtest_main
     )
 

@@ -13,6 +13,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_library(faster_profanity_lib
     src/word_finder/word_finder.cpp
     src/profane_detector/profane_detector.cpp
+    src/allowed_characters_loader/allowed_characters_loader.cpp
 )
 
 target_include_directories(faster_profanity_lib
@@ -25,11 +26,9 @@ add_executable(faster_profanity
     src/main.cpp
 )
 
-target_link_libraries(faster_profanity
-    PUBLIC
-        nlohmann_json::nlohmann_json
+target_link_libraries(faster_profanity_lib
     PRIVATE
-        faster_profanity_lib
+        nlohmann_json::nlohmann_json
 )
 
 FetchContent_Declare(
