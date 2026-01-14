@@ -11,4 +11,5 @@ private:
     std::unordered_set<char32_t> symbols;
     void load_regular_chars();
     void load_unicode_json(const std::string& path);
+    char32_t utf8_to_char32_t(const std::string& s);
 };

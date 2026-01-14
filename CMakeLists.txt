@@ -21,14 +21,19 @@ target_include_directories(faster_profanity_lib
         ${PROJECT_SOURCE_DIR}/include
 )
 
+target_link_libraries(faster_profanity_lib
+    PUBLIC
+        nlohmann_json::nlohmann_json
+        pybind11::module 
+)
 
 add_executable(faster_profanity
     src/main.cpp
 )
 
-target_link_libraries(faster_profanity_lib
+target_link_libraries(faster_profanity
     PRIVATE
-        nlohmann_json::nlohmann_json
+        faster_profanity_lib
 )
 
 FetchContent_Declare(
@@ -39,7 +44,13 @@ FetchContent_Declare(
   nlohmann_json
   URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
 )
+FetchContent_Declare(
+    pybind11
+    GIT_REPOSITORY https://github.com/pybind/pybind11.git
+    GIT_TAG        v2.11.1  
+)
 
+FetchContent_MakeAvailable(pybind11)
 FetchContent_MakeAvailable(googletest)
 FetchContent_MakeAvailable(nlohmann_json)
 

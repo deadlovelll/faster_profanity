@@ -26,7 +26,7 @@ void AllowedCharactersLoader::load_regular_chars() {
 void AllowedCharactersLoader::load_unicode_json(const std::string& path) {
     std::ifstream file(path);
     if (!file.is_open()) {
-        throw std::runtime_error("Cannot load unicode characters");
+        return;
     }
     nlohmann::json j; 
     file >> j;
@@ -37,14 +37,28 @@ void AllowedCharactersLoader::load_unicode_json(const std::string& path) {
         std::string s = item.get<std::string>();
         if (s.empty()) continue;
 
-        char32_t codepoint{};
-        const char* ptr = s.data();
-
-        size_t len = std::mbrtoc32(&codepoint, ptr, s.size(), &state);
-        if (len == static_cast<size_t>(-1) || len == static_cast<size_t>(-2)) {
-            throw std::runtime_error("Invalid UTF-8 sequence");
-        }
-
-        symbols.insert(codepoint);
+        char32_t c = utf8_to_char32_t(s);
+        symbols.insert(c);
     }
+}
+
+char32_t AllowedCharactersLoader::utf8_to_char32_t(const std::string& s) {
+    const unsigned char* p = reinterpret_cast<const unsigned char*>(s.data());
+    unsigned char b0 = p[0];
+
+    switch (b0 >> 4) {
+        case 0x0 ... 0x7:
+            return b0;
+
+        case 0xC:
+        case 0xD:
+            return ((b0 & 0x1F) << 6) |
+                (p[1] & 0x3F);
+
+        case 0xE:
+            return ((b0 & 0x0F) << 12) |
+                ((p[1] & 0x3F) << 6) |
+                (p[2] & 0x3F);
+    }
+    throw std::runtime_error("Unsupported UTF-8 sequence");
 }
