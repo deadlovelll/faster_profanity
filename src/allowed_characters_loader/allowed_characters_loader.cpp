@@ -1,7 +1,6 @@
 #include <fstream>
 #include <stdexcept>
 #include <string>
-#include <cwchar>
 #include <clocale>
 #include <unordered_set>
 
@@ -30,8 +29,6 @@ void AllowedCharactersLoader::load_unicode_json(const std::string& path) {
     }
     nlohmann::json j; 
     file >> j;
-
-    std::mbstate_t state{};
 
     for (const auto& item : j) {
         std::string s = item.get<std::string>();
