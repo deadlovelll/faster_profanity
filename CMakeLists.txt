@@ -5,7 +5,7 @@ project(faster_profanity LANGUAGES CXX)
 include(FetchContent)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)g
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -14,6 +14,8 @@ add_library(faster_profanity_lib
     src/word_finder/word_finder.cpp
     src/profane_detector/profane_detector.cpp
     src/allowed_characters_loader/allowed_characters_loader.cpp
+    src/swear_word_hider/swear_word_hider.cpp
+    src/text_trimmer/text_trimmer.cpp
 )
 
 target_include_directories(faster_profanity_lib

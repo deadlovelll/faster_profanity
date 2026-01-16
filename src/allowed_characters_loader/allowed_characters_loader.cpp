@@ -1,7 +1,6 @@
 #include <fstream>
-#include <stdexcept>
 #include <string>
-#include <clocale>
+#include <iostream>
 #include <unordered_set>
 
 #include "allowed_characters_loader/allowed_characters_loader.hpp"
@@ -10,52 +9,30 @@
 
 using json = nlohmann::json;
 
-std::unordered_set<char32_t> AllowedCharactersLoader::get_symbols() {
+std::unordered_set<std::u32string> AllowedCharactersLoader::get_symbols() {
     return symbols;
 }
 
 void AllowedCharactersLoader::load_regular_chars() {
-    char32_t speciaL_symbols[] = { U'@', U'$', U'*', U'"', U'\'' };
-    for (char32_t c = U'a'; c <= U'z'; ++c) symbols.insert(c);
-    for (char32_t c = U'A'; c <= U'Z'; ++c) symbols.insert(c);
-    for (char32_t c = U'0'; c <= U'9'; ++c) symbols.insert(c);
-    for (char32_t c : speciaL_symbols) symbols.insert(c);
+    char speciaL_symbols[] = { '@', '$', '*', '"', '\'' };
+    for (char c = 'a'; c <= 'z'; ++c) symbols.insert(std::u32string(1, c));
+    for (char c = 'A'; c <= 'Z'; ++c) symbols.insert(std::u32string(1, c));
+    for (char c = '0'; c <= '9'; ++c) symbols.insert(std::u32string(1, c));
+    for (char c : speciaL_symbols) symbols.insert(std::u32string(1, c));
 }
 
 void AllowedCharactersLoader::load_unicode_json(const std::string& path) {
     std::ifstream file(path);
     if (!file.is_open()) {
+        std::cout << "no file found" << std::endl;
         return;
     }
     nlohmann::json j; 
     file >> j;
 
     for (const auto& item : j) {
-        std::string s = item.get<std::string>();
+        std::u32string s = item.get<std::u32string>();
         if (s.empty()) continue;
-
-        char32_t c = utf8_to_char32_t(s);
-        symbols.insert(c);
+        symbols.insert(s);
     }
-}
-
-char32_t AllowedCharactersLoader::utf8_to_char32_t(const std::string& s) {
-    const unsigned char* p = reinterpret_cast<const unsigned char*>(s.data());
-    unsigned char b0 = p[0];
-
-    switch (b0 >> 4) {
-        case 0x0 ... 0x7:
-            return b0;
-
-        case 0xC:
-        case 0xD:
-            return ((b0 & 0x1F) << 6) |
-                (p[1] & 0x3F);
-
-        case 0xE:
-            return ((b0 & 0x0F) << 12) |
-                ((p[1] & 0x3F) << 6) |
-                (p[2] & 0x3F);
-    }
-    throw std::runtime_error("Unsupported UTF-8 sequence");
 }
