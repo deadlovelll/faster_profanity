@@ -9,9 +9,7 @@ public:
 
     // Default constructor.
     // Initializes the set of allowed characters with ASCII letters [a-zA-Z].
-    WordFinder() {
-        
-    }
+    WordFinder() {}
 
     /**
      * Returns a list of next words starting from a given index.
