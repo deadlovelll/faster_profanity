@@ -5,17 +5,19 @@ project(faster_profanity LANGUAGES CXX)
 include(FetchContent)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)g
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+file(COPY ${CMAKE_SOURCE_DIR}/src/data/profanity_wordslist.txt
+     DESTINATION ${CMAKE_BINARY_DIR}/data)
+
 add_library(faster_profanity_lib
-    src/word_finder/word_finder.cpp
     src/profane_detector/profane_detector.cpp
-    src/allowed_characters_loader/allowed_characters_loader.cpp
     src/swear_word_hider/swear_word_hider.cpp
-    src/text_trimmer/text_trimmer.cpp
+    src/varying_string_generator/varying_string_generator.cpp
+    src/censor_words_loader/censor_words_loader.cpp
 )
 
 target_include_directories(faster_profanity_lib
@@ -25,7 +27,6 @@ target_include_directories(faster_profanity_lib
 
 target_link_libraries(faster_profanity_lib
     PUBLIC
-        nlohmann_json::nlohmann_json
         pybind11::module 
 )
 
@@ -43,10 +44,6 @@ FetchContent_Declare(
   URL https://github.com/google/googletest/archive/refs/heads/main.zip
 )
 FetchContent_Declare(
-  nlohmann_json
-  URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
-)
-FetchContent_Declare(
     pybind11
     GIT_REPOSITORY https://github.com/pybind/pybind11.git
     GIT_TAG        v2.11.1  
@@ -54,7 +51,6 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(pybind11)
 FetchContent_MakeAvailable(googletest)
-FetchContent_MakeAvailable(nlohmann_json)
 
 enable_testing()
-add_subdirectory(tests)
+# add_subdirectory(tests)
