@@ -9,13 +9,15 @@
 
 int main(int argc, char** argv) {
     CensorWordsLoader cwd;
+    SwearWordHider swh;
     cwd.load_censor_words();
+    int undetected = 0;
     auto listtt = cwd.get_censor_words();
     for (auto ls: listtt) {
-        std::cout << ls << std::endl;
+        std::string result = swh.hide(ls, '*', listtt);
+        if (ls == result) {
+            undetected++;
+        }
     }
-    SwearWordHider swh;
-    std::string text = "bitchsukablyatpidorasina";
-    std::string result = swh.hide(text, '*', listtt);
-    std::cout << result << std::endl;
+    std::cout << "Total undetected = " << undetected << std::endl;
 }
