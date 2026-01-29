@@ -1,3 +1,4 @@
+#include <unordered_map>
 #include <unordered_set>
 
 #include "varying_string_generator/varying_string_generator.hpp"
@@ -14,7 +15,9 @@ void VaryingStringGenerator::generate_recursive(
     }
 
     char c = word[index];
-    auto it = CHARS_MAPPING.find(c);
+    std::unordered_map<char, std::vector<std::string>>::iterator it = (
+        CHARS_MAPPING.find(c)
+    );
     const std::vector<std::string>& replacements = (
         (it != CHARS_MAPPING.end()) ?
         it->second : std::vector<std::string>{std::string(1, c)}

@@ -57,5 +57,13 @@ std::string SwearWordHider::hide(
         }
     }
 
+    for (const std::string& bad_word : censor_full_list) {
+        size_t pos = 0;
+        while ((pos = result.find(bad_word, pos)) != std::string::npos) {
+            result.replace(pos, bad_word.size(), bad_word.size(), censor_char);
+            pos += bad_word.size();
+        }
+    }
+
     return result;
 }
