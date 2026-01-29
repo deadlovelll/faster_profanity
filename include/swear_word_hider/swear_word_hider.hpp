@@ -10,6 +10,7 @@ public:
         allowed_characters(symbols)
     {}
     std::string hide(std::string &text, std::string &censor_char);
+    int max_number_combinations;
 private:
     std::unordered_set<char32_t> allowed_characters;
     WordFinder word_finder;

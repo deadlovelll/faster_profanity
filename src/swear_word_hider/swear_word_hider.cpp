@@ -1,4 +1,5 @@
 #include <string>
+#include <tuple>
 
 #include "swear_word_hider/swear_word_hider.hpp"
 
@@ -26,6 +27,11 @@ std::string SwearWordHider::hide(std::string &text, std::string &censor_char) {
             current_word = "";
             continue;
         }
+        std::vector<std::tuple<std::string, size_t>> next_words_indices = word_finder.get_next_words(
+            &text, 
+            index,
+            num_of_next_words
+        )
     }
     return "";
 }
