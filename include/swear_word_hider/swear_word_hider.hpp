@@ -2,6 +2,7 @@
 #include <unordered_set>
 
 #include "node/node.hpp"
+#include "match/match.hpp"
 
 class SwearWordHider {
 public:

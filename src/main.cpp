@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
     // старт таймера
     auto start = std::chrono::high_resolution_clock::now();
 
-    auto result = swh.hide("i will go with my dog", '/');
+    auto result = swh.hide("dog style", '/');
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> elapsed = end - start;

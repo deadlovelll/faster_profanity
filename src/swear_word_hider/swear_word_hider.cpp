@@ -17,32 +17,55 @@ size_t SwearWordHider::utf8_char_len(unsigned char c) {
 }
 
 std::string SwearWordHider::hide(const std::string& text, char censor_char) {
-    std::string result = text;
     Node* node = root;
-    for (size_t i = 0; i < text.size();) {
-        size_t len = utf8_char_len(static_cast<unsigned char>(text[i]));
+    size_t i = 0;
+
+    std::vector<Match> matches;
+
+    while (i < text.size()) {
+        size_t len = utf8_char_len((unsigned char)text[i]);
         std::string ch = text.substr(i, len);
 
-        while (node && !node->children.count(ch)) node = node->fail;
+        while (node && !node->children.count(ch)) {
+            node = node->fail;
+        }
+
         node = node ? node->children[ch] : root;
 
-        if (node && !node->outputs.empty()) {
-            for (const auto& word : node->outputs) {
-                size_t start = i + len - word.size(); 
-                if (start < result.size()) {
-                    for (size_t j = 0; j < word.size(); ++j)
-                        result[start + j] = censor_char;
+        if (node) {
+            for (const std::string& word : node->outputs) {
+                size_t start = i + len - word.size();
+                bool left_ok = start == 0 ||
+                    !std::isalnum((unsigned char)text[start - 1]);
+
+                bool right_ok = start + word.size() >= text.size() ||
+                    !std::isalnum((unsigned char)text[start + word.size()]);
+
+                if (left_ok && right_ok) {
+                    matches.push_back({start, word.size()});
                 }
             }
         }
 
         i += len;
     }
+
+    std::string result = text;
+
+    for (auto& m : matches) {
+        if (m.start + m.len <= result.size()) {
+            for (size_t j = 0; j < m.len; ++j) {
+                result[m.start + j] = censor_char;
+            }
+        }
+    }
+
     return result;
 }
 
 void SwearWordHider::add_words(const std::unordered_set<std::string>& words) {
     for (const std::string& word: words) {
+        if (word.size() <= 1) continue;
         Node* node = root;
         for (size_t i = 0; i < word.size();) {
             size_t len = utf8_char_len(static_cast<unsigned char>(word[i]));
