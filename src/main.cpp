@@ -9,15 +9,30 @@
 
 int main(int argc, char** argv) {
     CensorWordsLoader cwd;
-    SwearWordHider swh;
     cwd.load_censor_words();
-    int undetected = 0;
     auto listtt = cwd.get_censor_words();
-    for (auto ls: listtt) {
-        std::string result = swh.hide(ls, '*', listtt);
+    SwearWordHider swh(listtt);
+
+    int undetected = 0;
+
+    for (const auto& ls : listtt) {
+        std::string result = swh.hide(ls, '*');
         if (ls == result) {
             undetected++;
         }
     }
+
+    // старт таймера
+    auto start = std::chrono::high_resolution_clock::now();
+
+    auto result = swh.hide("i will go with my dog", '/');
+
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> elapsed = end - start;
+
     std::cout << "Total undetected = " << undetected << std::endl;
+    std::cout << "Elapsed time: " << elapsed.count() << " ms" << std::endl;
+    std::cout << result << std::endl;
+
+    return 0;
 }

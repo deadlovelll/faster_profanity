@@ -1,14 +1,19 @@
 #include <string>
 #include <unordered_set>
 
+#include "node/node.hpp"
+
 class SwearWordHider {
 public:
-    std::string hide(
-        const std::string& text,
-        const char censor_char,
-        const std::unordered_set<std::string>& censor_full_list
-    );
+    SwearWordHider(const std::unordered_set<std::string>& words)
+        : root(new Node())
+    {
+        add_words(words);
+        build();
+    }
+    std::string hide(const std::string& text, const char censor_char);
 private:
+    Node* root;
     const std::unordered_set<std::string_view> allowed_chars = {
         "a","b","c","d","e","f","g","h","i","j","k","l","m",
         "n","o","p","q","r","s","t","u","v","w","x","y","z",
@@ -19,5 +24,7 @@ private:
         "α","β","µ","ç","∂","ε","φ","ø","×"
     };
     bool is_allowed_char(std::string_view utf8_char) const;
-    size_t utf8_char_len(unsigned char c, size_t remaining);
+    void add_words(const std::unordered_set<std::string>& words);
+    void build();
+    size_t utf8_char_len(unsigned char c);
 };
