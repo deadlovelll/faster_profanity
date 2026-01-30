@@ -10,13 +10,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-file(COPY ${CMAKE_SOURCE_DIR}/src/data
-     DESTINATION ${CMAKE_BINARY_DIR}/)
+file(COPY ${CMAKE_SOURCE_DIR}/src/data DESTINATION ${CMAKE_BINARY_DIR}/)
 
 add_library(faster_profanity_lib
     src/profane_detector/profane_detector.cpp
     src/swear_word_hider/swear_word_hider.cpp
-    src/varying_string_generator/varying_string_generator.cpp
     src/censor_words_loader/censor_words_loader.cpp
 )
 
