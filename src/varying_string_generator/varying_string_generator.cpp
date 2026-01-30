@@ -23,7 +23,7 @@ void VaryingStringGenerator::generate_recursive(
         it->second : std::vector<std::string>{std::string(1, c)}
     );
 
-    for (const auto& rep : replacements) {
+    for (const std::string& rep : replacements) {
         current += rep;
         generate_recursive(word, index + 1, current, out);
         current.resize(current.size() - rep.size());
@@ -32,7 +32,7 @@ void VaryingStringGenerator::generate_recursive(
 
 void VaryingStringGenerator::generate_word_combinations(
     std::unordered_set<std::string>& censor_full_list,
-    std::string& word
+    const std::string& word
 ) {
     std::string current;
     generate_recursive(word, 0, current, censor_full_list);

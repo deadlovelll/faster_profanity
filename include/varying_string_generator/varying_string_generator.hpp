@@ -7,7 +7,7 @@ class VaryingStringGenerator {
 public:
     void generate_word_combinations(
         std::unordered_set<std::string>& censor_full_list,
-        std::string& word
+        const std::string& word
     );
 private:
     std::unordered_map<char, std::vector<std::string>> CHARS_MAPPING = {
