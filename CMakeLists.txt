@@ -10,8 +10,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-file(COPY ${CMAKE_SOURCE_DIR}/src/data/profanity_wordslist.txt
-     DESTINATION ${CMAKE_BINARY_DIR}/data)
+file(COPY ${CMAKE_SOURCE_DIR}/src/data
+     DESTINATION ${CMAKE_BINARY_DIR}/)
 
 add_library(faster_profanity_lib
     src/profane_detector/profane_detector.cpp

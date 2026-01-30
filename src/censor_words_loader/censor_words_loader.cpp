@@ -2,9 +2,8 @@
 
 #include "censor_words_loader/censor_words_loader.hpp"
 
-
 void CensorWordsLoader::load_censor_words() {
-    std::ifstream file("data/profanity_wordslist.txt");
+    std::ifstream file("data/en/profanity_wordslist.txt");
     if (!file.is_open()) {
         std::cout << "no file found" << std::endl;
         return;

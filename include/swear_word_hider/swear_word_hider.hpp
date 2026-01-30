@@ -14,7 +14,7 @@ public:
     }
     std::string hide(const std::string& text, const char censor_char);
 private:
-    Node* root;
+    std::unique_ptr<Node> root = std::make_unique<Node>();
     const std::unordered_set<std::string_view> allowed_chars = {
         "a","b","c","d","e","f","g","h","i","j","k","l","m",
         "n","o","p","q","r","s","t","u","v","w","x","y","z",

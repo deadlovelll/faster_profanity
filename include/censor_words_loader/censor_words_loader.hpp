@@ -1,7 +1,6 @@
 #include <fstream>
 #include <unordered_set>
 
-
 class CensorWordsLoader {
     std::ifstream file;
     std::unordered_set<std::string> censor_words;
