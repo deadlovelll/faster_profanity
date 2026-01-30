@@ -52,7 +52,7 @@ std::string SwearWordHider::hide(const std::string& text, char censor_char) {
 
     std::string result = text;
 
-    for (auto& m : matches) {
+    for (Match& m : matches) {
         if (m.start + m.len <= result.size()) {
             for (size_t j = 0; j < m.len; ++j) {
                 result[m.start + j] = censor_char;
@@ -80,7 +80,11 @@ void SwearWordHider::add_words(const std::unordered_set<std::string>& words) {
 
 void SwearWordHider::build() {
     std::queue<Node*> q;
-    for (auto& [ch, node] : root->children) {
+
+    using Child = std::unordered_map<std::string, Node*>::value_type;
+
+    for (Child& entry : root->children) {
+        Node* node = entry.second;
         node->fail = root;
         q.push(node);
     }
@@ -88,15 +92,22 @@ void SwearWordHider::build() {
     while (!q.empty()) {
         Node* curr = q.front();
         q.pop();
-        for (auto& [ch, child] : curr->children) {
+        for (Child& entry : curr->children) {
+            const std::string& ch = entry.first;
+            Node* child = entry.second;
+
             Node* f = curr->fail;
-            while (f && !f->children.count(ch)) f = f->fail;
+            while (f && !f->children.count(ch))
+                f = f->fail;
+
             child->fail = f ? f->children[ch] : root;
+
             child->outputs.insert(
                 child->outputs.end(),
                 child->fail->outputs.begin(),
                 child->fail->outputs.end()
             );
+
             q.push(child);
         }
     }
