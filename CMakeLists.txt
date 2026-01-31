@@ -16,6 +16,8 @@ add_library(faster_profanity_lib
     src/profane_detector/profane_detector.cpp
     src/swear_word_hider/swear_word_hider.cpp
     src/censor_words_loader/censor_words_loader.cpp
+    src/trie_loader/trie_loader.cpp
+    src/utf8_sizer/utf8_sizer.cpp
 )
 
 target_include_directories(faster_profanity_lib

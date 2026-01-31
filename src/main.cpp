@@ -5,28 +5,31 @@
 #include <iostream>
 
 #include "censor_words_loader/censor_words_loader.hpp"
+#include "trie_loader/trie_loader.hpp"
 #include "swear_word_hider/swear_word_hider.hpp"
 
 int main(int argc, char** argv) {
     CensorWordsLoader cwd;
     cwd.load_censor_words();
     auto listtt = cwd.get_censor_words();
-    SwearWordHider swh(listtt);
+    SwearWordHider swh;
+    TrieLoader trie_loader(listtt);
+    Node* root = trie_loader.get_trie();
 
     int undetected = 0;
 
-    // for (const auto& ls : listtt) {
-    //     std::string result = swh.hide(ls, '*');
-    //     if (ls == result) {
-    //         undetected++;
-    //     }
-    // }
+    for (const auto& ls : listtt) {
+        std::string result = swh.hide(ls, '*', root);
+        if (ls == result) {
+            undetected++;
+        }
+    }
 
     // старт таймера
     auto start = std::chrono::high_resolution_clock::now();
 
-    std::string str = "bbbbbbbuuuuuuuuuuussssssssssiiiiiiiiiiiiinnnnnnnnnnnnnneeeeeeeeeesssssssssss"; 
-    auto result = swh.hide(str, '*');
+    std::string str = "dog"; 
+    auto result = swh.hide(str, '*', root);
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> elapsed = end - start;

@@ -1,20 +1,20 @@
+#pragma once
+
 #include <string>
 #include <unordered_set>
 
 #include "node/node.hpp"
-#include "match/match.hpp"
+#include "utf8_sizer/utf8_sizer.hpp"
 
 class SwearWordHider {
 public:
-    SwearWordHider(const std::unordered_set<std::string>& words)
-        : root(new Node())
-    {
-        add_words(words);
-        build();
-    }
-    std::string hide(const std::string& text, const char censor_char);
+    std::string hide(
+        const std::string& text, 
+        const char censor_char,
+        Node* root
+    );
 private:
-    std::unique_ptr<Node> root = std::make_unique<Node>();
+    UTF8Sizer utf8_sizer;
     const std::unordered_set<std::string_view> allowed_chars = {
         "a","b","c","d","e","f","g",
         "h","i","j","k","l","m", "n",
@@ -58,8 +58,4 @@ private:
         {"z", {"z", "2"}}
     };
     bool is_allowed_char(std::string_view utf8_char) const;
-    void add_words(const std::unordered_set<std::string>& words);
-    void build();
-    size_t utf8_char_len(unsigned char c);
-    size_t get_utf8_length(const std::string& str);
 };

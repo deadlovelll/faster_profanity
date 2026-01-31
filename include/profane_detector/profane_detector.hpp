@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 
 #include "swear_word_hider/swear_word_hider.hpp"
