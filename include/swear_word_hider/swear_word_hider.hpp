@@ -61,4 +61,5 @@ private:
     void add_words(const std::unordered_set<std::string>& words);
     void build();
     size_t utf8_char_len(unsigned char c);
+    size_t get_utf8_length(const std::string& str);
 };

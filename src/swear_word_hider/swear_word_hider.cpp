@@ -19,63 +19,52 @@ size_t SwearWordHider::utf8_char_len(unsigned char c) {
     return 1;
 }
 
-// Scans input text with aho automaton 
-std::string SwearWordHider::hide(const std::string& text, char censor_char) {
-    // Current node
-    Node* node = root.get();
-    // List of matches
-    std::vector<Match> matches;
-    // Position in input 
-    size_t i = 0;
+size_t SwearWordHider::get_utf8_length(const std::string& str) {
+    size_t length = 0;
+    for (size_t i = 0; i < str.size(); ++i) {
+        if ((static_cast<unsigned char>(str[i]) & 0xC0) != 0x80) {
+            length++;
+        }
+    }
+    return length;
+}
 
-    while (i < text.size()) {
-        // Get the length of utf8 char
-        size_t len = utf8_char_len((unsigned char)text[i]);
-        // Get char as string
+std::string SwearWordHider::hide(const std::string& text, char censor_char) {
+    std::string result = text;
+    std::string prev_char;
+
+    std::vector<size_t> history;
+    history.push_back(text.size());
+
+    Node* node = root.get();
+    for (size_t i = 0; i < text.size();) {
+        size_t len = utf8_char_len(static_cast<unsigned char>(text[i]));
         std::string ch = text.substr(i, len);
 
-        while (node && !node->children.count(ch)) {
-            node = node->fail;
+        bool is_stutter = (prev_char == ch && !node->children.count(ch));
+        if (!is_stutter) {
+            while (node && !node->children.count(ch)) node = node->fail;
+            node = node ? node->children[ch].get() : root.get();
+
+            history.resize(node->depth);
+            if (node != root.get()) history.push_back(i);
         }
         
-        // If exists go to the next node or back to root otherwise 
-        node = node ? node->children[ch].get() : root.get();
-
-        if (node) {
-            // Iter over nodes that ends with current one
+        if (node && !node->outputs.empty()) {
             for (const std::string& word : node->outputs) {
-                // Calc start index of the match
-                size_t start = i + len - word.size();
-                bool left_ok = (
-                    start == 0 || 
-                    !std::isalnum((unsigned char)text[start - 1])
-                );
-                bool right_ok = (
-                    start + word.size() >= text.size() ||
-                    !std::isalnum((unsigned char)text[start + word.size()])
-                );
-                if (left_ok && right_ok) {
-                    // Store match for censor it later
-                    matches.push_back({start, word.size()});
+                size_t pattern_length = get_utf8_length(word);
+                if (history.size() >= pattern_length) {
+                    size_t start_pos = history[history.size() - pattern_length];
+                    size_t end_pos = i + len;
+                    for (size_t j = start_pos; j < end_pos; ++j) {
+                        result[j] = censor_char;
+                    }
                 }
             }
         }
-
+        prev_char = ch;
         i += len;
     }
-
-    std::string result = text;
-
-    // Apply censor for all matches
-    for (Match& m : matches) {
-        if (m.start + m.len <= result.size()) {
-            for (size_t j = 0; j < m.len; ++j) {
-                // Replace with censor char 
-                result[m.start + j] = censor_char;
-            }
-        }
-    }
-    // Return censored word
     return result;
 }
 
@@ -84,6 +73,7 @@ void SwearWordHider::add_words(const std::unordered_set<std::string>& words) {
     for (const std::string& word: words) {
         if (word.size() <= 1) continue;
         Node* node = root.get();
+
         for (size_t i = 0; i < word.size();) {
             // Get char length and cast it to string
             size_t len = utf8_char_len(static_cast<unsigned char>(word[i]));
@@ -91,6 +81,7 @@ void SwearWordHider::add_words(const std::unordered_set<std::string>& words) {
             // Create new node if it doesn't exist
             if (!node->children.count(ch)) {
                 node->children[ch] = std::make_unique<Node>();
+                node->children[ch]->depth = node->depth + 1;
             }
             // Descend to child
             node = node->children[ch].get();

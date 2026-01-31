@@ -15,17 +15,18 @@ int main(int argc, char** argv) {
 
     int undetected = 0;
 
-    for (const auto& ls : listtt) {
-        std::string result = swh.hide(ls, '*');
-        if (ls == result) {
-            undetected++;
-        }
-    }
+    // for (const auto& ls : listtt) {
+    //     std::string result = swh.hide(ls, '*');
+    //     if (ls == result) {
+    //         undetected++;
+    //     }
+    // }
 
     // старт таймера
     auto start = std::chrono::high_resolution_clock::now();
 
-    auto result = swh.hide("dog style", '/');
+    std::string str = "bbbbbbbuuuuuuuuuuussssssssssiiiiiiiiiiiiinnnnnnnnnnnnnneeeeeeeeeesssssssssss"; 
+    auto result = swh.hide(str, '*');
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> elapsed = end - start;
