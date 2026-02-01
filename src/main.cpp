@@ -14,7 +14,9 @@ PYBIND11_MODULE(faster_profanity, fp) {
         R"doc(docs will be here)doc"
     )
         .def(
-            py::init<>(),
+            py::init<const std::string&, const std::string&>(),
+            py::arg("lang") = "en",
+            py::arg("custom_dictionary") = "",
             R"doc(docs will be here)doc"
         )
         .def(

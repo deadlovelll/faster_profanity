@@ -9,8 +9,8 @@
 
 class ProfaneDetector {
 public:
-    ProfaneDetector() {
-        censor_words_loader.load_censor_words();
+    ProfaneDetector(const std::string& lang, const std::string& custom_dictionary) {
+        censor_words_loader.load_censor_words(lang, custom_dictionary);
         std::unordered_set<std::string> words = censor_words_loader.get_censor_words();
         TrieLoader trie_loader(words);
         this->root = trie_loader.get_trie();
