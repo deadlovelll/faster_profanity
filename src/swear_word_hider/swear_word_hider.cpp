@@ -57,6 +57,15 @@ std::string SwearWordHider::hide(
             }
             for (const std::string& v_ch: virtual_chars) {
                 Node* temp_node = curr_state.node;
+                bool is_repeat = (v_ch == prev_char && !temp_node->children.count(v_ch));
+                if (is_repeat && temp_node != root) {
+                    std::vector<size_t> skip_history = curr_state.history;
+                    if (seen.insert(temp_node).second) {
+                        next_states.push_back({temp_node, std::move(skip_history)});
+                    }
+                    continue;
+                }
+
                 while (temp_node != root && !temp_node->children.count(v_ch)) {
                     temp_node = temp_node->fail;
                 }
@@ -78,6 +87,7 @@ std::string SwearWordHider::hide(
                         next_states.push_back({next_node, std::move(next_history)});
                     }
                 }
+                prev_char = v_ch;
             }
         }
         current_states = std::move(next_states);
