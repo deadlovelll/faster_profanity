@@ -1,9 +1,10 @@
 #include "trie_loader/trie_loader.hpp"
 
+#include <memory>
 #include <queue>
 
-Node* TrieLoader::get_trie() {
-    return root.get();
+std::unique_ptr<Node> TrieLoader::get_trie() {
+    return std::move(root);
 }
 
 // Loads all profane words from set into trie

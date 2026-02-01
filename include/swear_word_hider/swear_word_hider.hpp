@@ -8,11 +8,7 @@
 
 class SwearWordHider {
 public:
-    std::string hide(
-        const std::string& text, 
-        const char censor_char,
-        Node* root
-    );
+    std::string hide(const std::string& text, const char censor_char, Node* root);
 private:
     UTF8Sizer utf8_sizer;
     const std::unordered_set<std::string_view> allowed_chars = {

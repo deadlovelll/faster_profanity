@@ -4,37 +4,21 @@
 #include <pybind11/stl.h>
 #include <iostream>
 
-#include "censor_words_loader/censor_words_loader.hpp"
-#include "trie_loader/trie_loader.hpp"
-#include "swear_word_hider/swear_word_hider.hpp"
+#include "profane_detector/profane_detector.hpp"
 
 int main(int argc, char** argv) {
-    CensorWordsLoader cwd;
-    cwd.load_censor_words();
-    auto listtt = cwd.get_censor_words();
-    SwearWordHider swh;
-    TrieLoader trie_loader(listtt);
-    Node* root = trie_loader.get_trie();
-
-    int undetected = 0;
-
-    for (const auto& ls : listtt) {
-        std::string result = swh.hide(ls, '*', root);
-        if (ls == result) {
-            undetected++;
-        }
-    }
+    ProfaneDetector profane_detector;
 
     // старт таймера
     auto start = std::chrono::high_resolution_clock::now();
 
-    std::string str = "dog"; 
-    auto result = swh.hide(str, '*', root);
+    std::string str = "ssssshhhhhhhiiiiiitttttttttttttt"; 
+    auto result = profane_detector.censor(str, '*');
+    std::cout << result << std::endl;
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> elapsed = end - start;
 
-    std::cout << "Total undetected = " << undetected << std::endl;
     std::cout << "Elapsed time: " << elapsed.count() << " ms" << std::endl;
     std::cout << result << std::endl;
 

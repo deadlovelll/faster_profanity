@@ -14,7 +14,7 @@ public:
         add_words(words);
         build();
     }
-    Node* get_trie();
+    std::unique_ptr<Node> get_trie();
 private:
     std::unique_ptr<Node> root = std::make_unique<Node>();
     UTF8Sizer utf8_sizer;
