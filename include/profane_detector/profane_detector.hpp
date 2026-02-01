@@ -16,7 +16,7 @@ public:
         this->root = trie_loader.get_trie();
     }
     std::string censor(const std::string &text, const char censor_char);
-    bool contains_profanity(const std::string &text, const char censor_char);
+    bool contains_profanity(const std::string &text);
 private:
     std::unique_ptr<Node> root;
     SwearWordHider swear_word_hider;
