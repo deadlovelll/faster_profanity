@@ -1,35 +1,24 @@
-#include <pybind11/detail/common.h>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <ostream>
+#include <iostream>
 
 #include "profane_detector/profane_detector.hpp"
 
-namespace py = pybind11;
+int main(int argc, char** argv) {
+    std::string lang = "en";
+    std::string custom_dictionary = "";
+    ProfaneDetector profane_detector(lang, custom_dictionary);
 
-PYBIND11_MODULE(faster_profanity, fp) {
-    fp.doc() = R"doc(docs will be here)doc";
-    py::class_<ProfaneDetector>(
-        fp, 
-        "ProfaneDetector", 
-        R"doc(docs will be here)doc"
-    )
-        .def(
-            py::init<const std::string&, const std::string&>(),
-            py::arg("lang") = "en",
-            py::arg("custom_dictionary") = "",
-            R"doc(docs will be here)doc"
-        )
-        .def(
-            "censor",
-            &ProfaneDetector::censor,
-            py::arg("text"),
-            py::arg("censor_char"),
-            R"doc(docs will be here)doc"
-        )
-        .def(
-            "contains_profanity",
-            &ProfaneDetector::contains_profanity,
-            py::arg("text"),
-            R"doc(docs will be here)doc"
-        );
+    auto start = std::chrono::high_resolution_clock::now();
+
+    std::string str = "doggy-style"; 
+    auto result = profane_detector.censor(str, '*');
+    std::cout << result << std::endl;
+
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> elapsed = end - start;
+
+    std::cout << "Elapsed time: " << elapsed.count() << " ms" << std::endl;
+    std::cout << result << std::endl;
+
+    return 0;
 }

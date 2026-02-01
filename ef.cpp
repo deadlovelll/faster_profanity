@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <iostream>
 
 #include "swear_word_hider/swear_word_hider.hpp"
 #include "state/state.hpp"
@@ -67,11 +68,27 @@ std::string SwearWordHider::hide(
                         next_history.push_back(i);
                         if (!next_node->outputs.empty()) {
                             for (const std::string& word: next_node->outputs) {
-                                size_t pattern_len = utf8_sizer.utf8_word_length(word);
-                                if (next_history.size() >= pattern_len) {
-                                    size_t start_pos = next_history.empty() ? i : next_history.front();
+                                size_t patter_len = utf8_sizer.utf8_word_length(word);
+                                if (next_history.size() >= patter_len) {
+                                    size_t start_pos = next_history[next_history.size() - patter_len];
                                     size_t end_pos = i + len;
-                                    for (size_t j = start_pos; j < end_pos; ++j) result[j] = censor_char;
+                                    printf("Match: [%s], Bounds: [%c|%c]\n", 
+                                        text.substr(start_pos, end_pos-start_pos).c_str(),
+                                        start_pos > 0 ? text[start_pos-1] : '^',
+                                        end_pos < text.size() ? text[end_pos] : '$');
+                                        bool is_left_border_ok = (
+                                            start_pos > 0 
+                                            || std::isalpha((unsigned char) text[start_pos-1])
+                                        );
+                                        bool is_right_border_ok = (
+                                            end_pos < text.size()
+                                            || std::isalpha((unsigned char) text[end_pos])
+                                        );
+                                        if (!is_left_border_ok && !is_right_border_ok) {
+                                            for (size_t j = start_pos; j < end_pos; ++j) {
+                                                result[j] = censor_char;
+                                            } 
+                                        }
                                 }
                             }
                         }
