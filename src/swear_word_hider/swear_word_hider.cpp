@@ -24,8 +24,13 @@ std::string SwearWordHider::hide(
         size_t len = utf8_sizer.utf8_char_len(static_cast<unsigned char>(text[i]));
         std::string ch = text.substr(i, len);
 
-        bool is_stutter = (prev_char == ch && !node->children.count(ch));
-        if (!is_stutter) {
+        bool is_skipable = (
+            // Check if it's a repeatable char
+            prev_char == ch && !node->children.count(ch)
+            // Or it's a filler (not a char, e.g: ".", " ", ";" etc)
+            || !allowed_chars.contains(ch)
+        );
+        if (!is_skipable) {
             while (node && !node->children.count(ch)) node = node->fail;
             node = node ? node->children[ch].get() : root;
 
