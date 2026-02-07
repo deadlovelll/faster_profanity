@@ -16,11 +16,11 @@ public:
         TrieLoader trie_loader(words);
         this->root = trie_loader.get_trie();
     }
+    std::string censor(const std::string &text, const char censor_char);
     bool contains_profanity(const std::string &text);
 private:
     std::unique_ptr<Node> root;
     SwearWordHider swear_word_hider;
     CensorWordsLoader censor_words_loader;
     TextNormalizer text_normalizer;
-    std::string censor(const std::string &text, const char censor_char);
 };

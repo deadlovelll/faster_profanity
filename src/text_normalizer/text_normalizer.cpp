@@ -1,8 +1,10 @@
 #include "text_normalizer/text_normalizer.hpp"
+#include <sstream>
 
 void TextNormalizer::normalize(std::string& text) {
     to_lower(text);
     collapse_repeats(text);
+    trim_word_boundaries(text);
 }
 
 void TextNormalizer::to_lower(std::string& text) {
@@ -25,23 +27,41 @@ void TextNormalizer::collapse_repeats(std::string& text, int max_repeat) {
         }
         out.push_back(c);
     }
+    text.swap(out);
 }
 
 void TextNormalizer::trim_word_boundaries(std::string& text) {
-    size_t i = 0;
+    std::string out;
+    std::istringstream iss(text);
+    std::string token;
 
-    while (i < text.size()) {
-        while (i < text.size() && !is_word_char(text[i])) i++;
+    while (iss >> token) {
+        size_t start = 0;
+        while (
+            start < token.size() && 
+            !std::isalnum(static_cast<unsigned char>(token[start]))
+        ) ++start;
 
-        size_t start = i;
-
-        while (i < text.size() && is_word_char(text[i])) i++;
-
-        size_t end = i;
+        size_t end = token.size();
+        while (
+            end > start && 
+            !std::isalnum(static_cast<unsigned char>(token[end - 1]))
+        ) --end;
 
         if (start < end) {
-            if (!text.empty()) text += ' ';
-            text += text.substr(start, end - start);
+            if (!out.empty()) out += ' ';
+            out += token.substr(start, end - start);
         }
     }
+
+    text.swap(out);
 }
+
+// bool TextNormalizer::is_word_char(char c) {
+//     return std::isalpha(static_cast<unsigned char>(c));
+// }
+
+// bool TextNormalizer::is_subsymbol(char c) {
+//     static const std::string subs = "@*48β(<ç∂3€εφ96#ħ1!|;κµ0øρ®$5§7+v×¥2α"; 
+//     return subs.find(c) != std::string::npos;
+// }
