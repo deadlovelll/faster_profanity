@@ -10,7 +10,7 @@ int main(int argc, char** argv) {
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    std::string str = "doggy-style"; 
+    std::string str = "breeeeeeeead"; 
     auto result = profane_detector.censor(str, '*');
     std::cout << result << std::endl;
 

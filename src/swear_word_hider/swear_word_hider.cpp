@@ -5,93 +5,55 @@
 #include <vector>
 
 #include "swear_word_hider/swear_word_hider.hpp"
-#include "state/state.hpp"
 
 // Checks if char is valid or not, see swear_word_hider.hpp above
 bool SwearWordHider::is_allowed_char(std::string_view utf8_char) const {
     return allowed_chars.contains(utf8_char);
 }
 
+bool SwearWordHider::is_word_boundary(const std::string& text, size_t start, size_t end) {
+    auto is_boundary = [](unsigned char c) {
+        return !std::isalnum(c) && c != '_' && c != '-';
+    };
+
+    if (start > 0) {
+        unsigned char left = static_cast<unsigned char>(text[start - 1]);
+        if (!is_boundary(left)) return false;
+    }
+
+    if (end < text.size()) {
+        unsigned char right = static_cast<unsigned char>(text[end]);
+        if (!is_boundary(right)) return false;
+    }
+
+    return true;
+}
+
 std::string SwearWordHider::hide(
-    const std::string& text, 
+    const std::string& text,
     char censor_char,
     Node* root
 ) {
     std::string result = text;
-    std::string prev_char;
-
-    std::vector<State> current_states;
-    current_states.push_back({root, {}});
-
+    Node* node = root;
     for (size_t i = 0; i < text.size();) {
-        std::vector<std::string> virtual_chars;
-        std::vector<State> next_states;
-        std::unordered_set<Node*> seen;
-
         size_t len = utf8_sizer.utf8_char_len(static_cast<unsigned char>(text[i]));
         std::string ch = text.substr(i, len);
 
-        std::unordered_map<std::string, std::vector<char>>::const_iterator it = (
-            reverse_map.find(ch)
-        );
-        if (it != reverse_map.end()) {
-            for (char c: it->second) {
-                virtual_chars.push_back(std::string(1, c));
+        while (node && !node->children.count(ch)) node = node->fail;
+        node = node ? node->children[ch].get() : root;
+
+        if (node && !node->outputs.empty()) {
+            for (const auto& word : node->outputs) {
+                size_t start = i + len - word.size();
+                size_t end = start + word.size();
+                if (start < result.size() && is_word_boundary(result, start, end)) {
+                    for (size_t j = 0; j < word.size(); ++j)
+                        result[start + j] = censor_char;
+                }
             }
-        } else {
-            virtual_chars.push_back(ch);
         }
 
-        next_states.push_back({root, {}});
-        for (State& curr_state: current_states) {
-            bool is_skipable = (
-                // Check if it's a repeatable char
-                prev_char == ch && !curr_state.node->children.count(ch)
-                // Or it's a filler (not a char, e.g: ".", " ", ";" etc)
-                || !allowed_chars.contains(ch)
-            );
-            if (!is_skipable && curr_state.node != root) {
-                if (seen.insert(curr_state.node).second) {
-                    next_states.push_back(curr_state);
-                }
-            }
-            for (const std::string& v_ch: virtual_chars) {
-                Node* temp_node = curr_state.node;
-                bool is_repeat = (v_ch == prev_char && !temp_node->children.count(v_ch));
-                if (is_repeat && temp_node != root) {
-                    std::vector<size_t> skip_history = curr_state.history;
-                    if (seen.insert(temp_node).second) {
-                        next_states.push_back({temp_node, std::move(skip_history)});
-                    }
-                    continue;
-                }
-
-                while (temp_node != root && !temp_node->children.count(v_ch)) {
-                    temp_node = temp_node->fail;
-                }
-                if (temp_node->children.count(v_ch)) {
-                    Node* next_node = temp_node->children[v_ch].get();
-                    if (seen.insert(next_node).second) {
-                        std::vector<size_t> next_history = curr_state.history;
-                        next_history.push_back(i);
-                        if (!next_node->outputs.empty()) {
-                            for (const std::string& word: next_node->outputs) {
-                                size_t pattern_len = utf8_sizer.utf8_word_length(word);
-                                if (next_history.size() >= pattern_len) {
-                                    size_t start_pos = next_history.empty() ? i : next_history.front();
-                                    size_t end_pos = i + len;
-                                    for (size_t j = start_pos; j < end_pos; ++j) result[j] = censor_char;
-                                }
-                            }
-                        }
-                        next_states.push_back({next_node, std::move(next_history)});
-                    }
-                }
-                prev_char = v_ch;
-            }
-        }
-        current_states = std::move(next_states);
-        prev_char = ch;
         i += len;
     }
     return result;

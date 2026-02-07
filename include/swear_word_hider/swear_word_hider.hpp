@@ -69,4 +69,6 @@ private:
         {"2", {'z'}}
     };
     bool is_allowed_char(std::string_view utf8_char) const;
+protected:
+    bool is_word_boundary(const std::string& text, size_t start, size_t end);
 };
