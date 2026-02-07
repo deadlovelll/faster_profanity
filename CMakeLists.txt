@@ -18,6 +18,7 @@ add_library(faster_profanity_lib
     src/censor_words_loader/censor_words_loader.cpp
     src/trie_loader/trie_loader.cpp
     src/utf8_sizer/utf8_sizer.cpp
+    src/text_normalizer/text_normalizer.cpp
 )
 
 target_include_directories(faster_profanity_lib
@@ -53,4 +54,4 @@ FetchContent_MakeAvailable(pybind11)
 FetchContent_MakeAvailable(googletest)
 
 enable_testing()
-# add_subdirectory(tests)
+add_subdirectory(tests)
