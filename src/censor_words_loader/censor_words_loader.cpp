@@ -8,7 +8,7 @@ void CensorWordsLoader::load_censor_words(
 ) {
     std::string path;
     if (custom_dicstionary.empty()) {
-        path = std::format("data/{}/profanity_wordslist.txt", lang);
+        path = std::format("data/{}/profanity_words/profanity_wordslist.txt", lang);
     } else {
         path = custom_dicstionary;
     }
