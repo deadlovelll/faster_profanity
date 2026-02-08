@@ -39,13 +39,15 @@ void TextNormalizer::trim_word_boundaries(std::string& text) {
         size_t start = 0;
         while (
             start < token.size() && 
-            !std::isalnum(static_cast<unsigned char>(token[start]))
+            !std::isalnum(static_cast<unsigned char>(token[start])) &&
+            !is_subsymbol(token[start])
         ) ++start;
 
         size_t end = token.size();
         while (
             end > start && 
-            !std::isalnum(static_cast<unsigned char>(token[end - 1]))
+            !std::isalnum(static_cast<unsigned char>(token[end - 1])) &&
+            !is_subsymbol(token[start])
         ) --end;
 
         if (start < end) {
@@ -61,7 +63,7 @@ void TextNormalizer::trim_word_boundaries(std::string& text) {
 //     return std::isalpha(static_cast<unsigned char>(c));
 // }
 
-// bool TextNormalizer::is_subsymbol(char c) {
-//     static const std::string subs = "@*48β(<ç∂3€εφ96#ħ1!|;κµ0øρ®$5§7+v×¥2α"; 
-//     return subs.find(c) != std::string::npos;
-// }
+bool TextNormalizer::is_subsymbol(char c) {
+    static const std::string subs = "@*48β(<ç∂3€εφ96#ħ1!|;κµ0øρ®$5§7+v×¥2α"; 
+    return subs.find(c) != std::string::npos;
+}
