@@ -12,4 +12,7 @@ protected:
     bool is_word_char(char c);
     bool is_subsymbol(char c);
     bool is_word_inner(char c);
+    bool is_obfuscated_word(const std::string& s, size_t start, size_t end);
+    std::string clean_obfuscated_word(const std::string& s, size_t start, size_t end);
+    bool is_filler(char c);
 };
