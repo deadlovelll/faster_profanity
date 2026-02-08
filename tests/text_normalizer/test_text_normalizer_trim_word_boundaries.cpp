@@ -3,26 +3,26 @@
 
 class TestNormalizer : public ::testing::Test, public TextNormalizer {};
 
-TEST_F(TestNormalizer, RemovesPunctuationAroundSingleWord) {
-    std::string text = "!!porn!!";
+TEST_F(TestNormalizer, PunctuationAroundSingleWord) {
+    std::string text = "..porn..";
     trim_word_boundaries(text);
     EXPECT_EQ(text, "porn");
 }
 
-TEST_F(TestNormalizer, MultipleWordsWithGarbageAround) {
-    std::string text = "!!porn!! !!sex!!";
+TEST_F(TestNormalizer, DoesNotClearMultipleWordsWithGarbageAround) {
+    std::string text = "porn,, ,,sex,,";
     trim_word_boundaries(text);
     EXPECT_EQ(text, "porn sex");
 }
 
 TEST_F(TestNormalizer, PreservesInnerSymbols) {
-    std::string text = "sh!thouse";
+    std::string text = "sh.thouse";
     trim_word_boundaries(text);
-    EXPECT_EQ(text, "sh!thouse");
+    EXPECT_EQ(text, "sh.thouse");
 }
 
 TEST_F(TestNormalizer, PreservesInnerSymbolsAndTrailingOnes) {
-    std::string text = "!!sh!thouse!!";
+    std::string text = "..sh!thouse..";
     trim_word_boundaries(text);
     EXPECT_EQ(text, "sh!thouse");
 }
@@ -36,7 +36,7 @@ TEST_F(TestNormalizer, PreservesInnerSymbolsWithNum) {
 TEST_F(TestNormalizer, PreservesInnerSymbolsWithDollarSign) {
     std::string text = "$$sh!thouse$$";
     trim_word_boundaries(text);
-    EXPECT_EQ(text, "sh!thouse");
+    EXPECT_EQ(text, "$$sh!thouse$$");
 }
 
 TEST_F(TestNormalizer, PreservesInnerSymbolsWithAnSign) {
@@ -48,7 +48,7 @@ TEST_F(TestNormalizer, PreservesInnerSymbolsWithAnSign) {
 TEST_F(TestNormalizer, MultipleWordsWithGarbageAroundAndInnerSymbolsAndTrailingOnesWithExclamationPoint) {
     std::string text = "!!sh!thouse!! !!a$$hole!!";
     trim_word_boundaries(text);
-    EXPECT_EQ(text, "sh!thouse a$$hole");
+    EXPECT_EQ(text, "!!sh!thouse!! !!a$$hole!!");
 }
 
 TEST_F(TestNormalizer, MultipleWordsWithGarbageAroundAndInnerSymbolsAndTrailingOnesWithDot) {
@@ -72,7 +72,7 @@ TEST_F(TestNormalizer, MultipleWordsWithGarbageAroundAndInnerSymbolsAndTrailingO
 TEST_F(TestNormalizer, MultipleWordsWithGarbageAroundAndInnerSymbolsAndTrailingOnesWithSemiColon) {
     std::string text = ";;sh!thouse;; ;;a$$hole;;";
     trim_word_boundaries(text);
-    EXPECT_EQ(text, "sh!thouse a$$hole");
+    EXPECT_EQ(text, ";;sh!thouse;; ;;a$$hole;;");
 }
 
 TEST_F(TestNormalizer, MultipleWordsWithGarbageAroundAndInnerSymbolsAndTrailingOnesWithQuestionMark) {
@@ -84,13 +84,13 @@ TEST_F(TestNormalizer, MultipleWordsWithGarbageAroundAndInnerSymbolsAndTrailingO
 TEST_F(TestNormalizer, MultipleWordsWithGarbageAroundAndInnerSymbolsAndTrailingOnesWithAtMark) {
     std::string text = "@@sh!thouse@@ @@a$$hole@@";
     trim_word_boundaries(text);
-    EXPECT_EQ(text, "sh!thouse a$$hole");
+    EXPECT_EQ(text, "@@sh!thouse@@ @@a$$hole@@");
 }
 
 TEST_F(TestNormalizer, MultipleWordsWithGarbageAroundAndInnerSymbolsAndTrailingOnesWithHashtag) {
     std::string text = "##sh!thouse## ##a$$hole##";
     trim_word_boundaries(text);
-    EXPECT_EQ(text, "sh!thouse a$$hole");
+    EXPECT_EQ(text, "##sh!thouse## ##a$$hole##");
 }
 
 TEST_F(TestNormalizer, MultipleWordsWithGarbageAroundAndInnerSymbolsAndTrailingOnesWithCaret) {
@@ -108,13 +108,13 @@ TEST_F(TestNormalizer, MultipleWordsWithGarbageAroundAndInnerSymbolsAndTrailingO
 TEST_F(TestNormalizer, MultipleWordsWithGarbageAroundAndInnerSymbolsAndTrailingOnesWithStarSign) {
     std::string text = "**sh!thouse** **a$$hole**";
     trim_word_boundaries(text);
-    EXPECT_EQ(text, "sh!thouse a$$hole");
+    EXPECT_EQ(text, "**sh!thouse** **a$$hole**");
 }
 
 TEST_F(TestNormalizer, MultipleWordsWithGarbageAroundAndInnerSymbolsAndTrailingOnesWithLeftBracets) {
     std::string text = "((sh!thouse(( ((a$$hole((";
     trim_word_boundaries(text);
-    EXPECT_EQ(text, "sh!thouse a$$hole");
+    EXPECT_EQ(text, "((sh!thouse(( ((a$$hole((");
 }
 
 TEST_F(TestNormalizer, MultipleWordsWithGarbageAroundAndInnerSymbolsAndTrailingOnesWithRightBracets) {
@@ -132,7 +132,7 @@ TEST_F(TestNormalizer, MultipleWordsWithGarbageAroundAndInnerSymbolsAndTrailingO
 TEST_F(TestNormalizer, MultipleWordsWithGarbageAroundAndInnerSymbolsAndTrailingOnesWithPlusSign) {
     std::string text = "++sh!thouse++ ++a$$hole++";
     trim_word_boundaries(text);
-    EXPECT_EQ(text, "sh!thouse a$$hole");
+    EXPECT_EQ(text, "++sh!thouse++ ++a$$hole++");
 }
 
 TEST_F(TestNormalizer, MultipleWordsWithGarbageAroundAndInnerSymbolsAndTrailingOnesWithEqualSign) {
@@ -162,11 +162,17 @@ TEST_F(TestNormalizer, MultipleWordsWithGarbageAroundAndInnerSymbolsWithSlashes)
 TEST_F(TestNormalizer, MultipleWordsWithGarbageAroundAndInnerSymbolsWithPipes) {
     std::string text = "|sh!thouse| |a$$hole|";
     trim_word_boundaries(text);
-    EXPECT_EQ(text, "sh!thouse a$$hole");
+    EXPECT_EQ(text, "|sh!thouse| |a$$hole|");
 }
 
-TEST_F(TestNormalizer, MultipleWordsWithGarbageAroundAndInnerSymbolsWithAngles) {
-    std::string text = "<sh!thouse> <a$$hole>";
+TEST_F(TestNormalizer, MultipleWordsWithGarbageAroundAndInnerSymbolsWithLeftAngles) {
+    std::string text = "<sh!thouse< <a$$hole<";
+    trim_word_boundaries(text);
+    EXPECT_EQ(text, "<sh!thouse< <a$$hole<");
+}
+
+TEST_F(TestNormalizer, MultipleWordsWithGarbageAroundAndInnerSymbolsWithRightAngles) {
+    std::string text = ">sh!thouse> >a$$hole>";
     trim_word_boundaries(text);
     EXPECT_EQ(text, "sh!thouse a$$hole");
 }
@@ -180,13 +186,14 @@ TEST_F(TestNormalizer, MultipleWordsWithGarbageAroundAndInnerSymbolsWithTildesAn
 TEST_F(TestNormalizer, HandlesLeadingAndTrailingSpaces) {
     std::string text = "   !!!bad_word!!!   ";
     trim_word_boundaries(text);
-    EXPECT_EQ(text, "bad_word");
+    EXPECT_EQ(text, "!!!bad_word!!!");
 }
 
-TEST_F(TestNormalizer, OnlyPunctuationResultsInEmptyString) {
+TEST_F(TestNormalizer, DoesNotRemovePossiblieSubstCharacters) {
     std::string text = "!!!@@@###";
+    std::string text_cp = "!!!@@@###";
     trim_word_boundaries(text);
-    EXPECT_TRUE(text.empty());
+    EXPECT_EQ(text, text_cp);
 }
 
 TEST_F(TestNormalizer, AlreadyCleanTextUnchanged) {

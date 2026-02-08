@@ -26,3 +26,39 @@ TEST_F(TestCollapseRepeatsNormalizer, RemovesRepeatingCharWholeWord) {
     collapse_repeats(text);
     EXPECT_EQ(text, "ppoorrnn");
 }
+
+TEST_F(TestCollapseRepeatsNormalizer, RemovesRepeatingFillerInMiddle) {
+    std::string text = "po...................................rn";
+    collapse_repeats(text);
+    EXPECT_EQ(text, "po..rn");
+}
+
+TEST_F(TestCollapseRepeatsNormalizer, RemovesRepeatingFillerInEnd) {
+    std::string text = "por...................................n";
+    collapse_repeats(text);
+    EXPECT_EQ(text, "por..n");
+}
+
+TEST_F(TestCollapseRepeatsNormalizer, RemovesRepeatingFillerInStart) {
+    std::string text = "p...................................orn";
+    collapse_repeats(text);
+    EXPECT_EQ(text, "p..orn");
+}
+
+TEST_F(TestCollapseRepeatsNormalizer, RemovesRepeatingFillerAfterWord) {
+    std::string text = "porn...................................";
+    collapse_repeats(text);
+    EXPECT_EQ(text, "porn..");
+}
+
+TEST_F(TestCollapseRepeatsNormalizer, RemovesRepeatingFillerBeforeWord) {
+    std::string text = "...................................porn";
+    collapse_repeats(text);
+    EXPECT_EQ(text, "..porn");
+}
+
+TEST_F(TestCollapseRepeatsNormalizer, RemovesRepeatingFillerInWholeWord) {
+    std::string text = "...................................p...................................o...................................r...................................n...................................";
+    collapse_repeats(text);
+    EXPECT_EQ(text, "..p..o..r..n..");
+}
