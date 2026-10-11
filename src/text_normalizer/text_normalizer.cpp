@@ -3,7 +3,7 @@
 #include <iostream>
 
 void TextNormalizer::normalize(std::string& text) {
-    text_lowerizer.lower(text);
+    unicode_normalizer.normalize(text);
     collapse_repeats(text);
     trim_word_boundaries(text);
     remove_letter_fillers(text);

@@ -1,0 +1,236 @@
+# Non-English profanity extracted from src/data/en/profanity_words/profanity_wordslist.txt.
+# Not loaded by any code. To be split into src/data/<lang>/profanity_words/ later.
+# Format: "# <lang>" section header, then one entry per line.
+
+# ar - Arabic
+abeed
+sharmuta
+zubb
+
+# de - German
+arschloch
+ficken
+fotze
+judensau
+kanake
+muschi
+nutte
+piefke
+scheiss
+schlampe
+wichser
+
+# es - Spanish
+bastardo
+bollera
+cabron
+cabronazo
+cagarse
+calientapollas
+chinga
+chingado
+chupaculos
+chupapollas
+cojones
+comemierda
+comepollas
+coño
+culo
+follar
+gilipollas
+guarra
+hijo de puta
+hijoputa
+huevon
+joder
+maricón
+me cago en
+mierda
+pendejo
+perra
+polla
+puta
+puto
+soplapollas
+tu puta madre
+verga
+zorra
+
+# fa - Persian
+qahbeh
+
+# fi - Finnish
+mulkku
+paska
+pillu
+vittu
+
+# fr - French
+bougnoule
+bâtard
+charogne
+connard
+enculer
+enculé
+enfoiré
+foutre
+merde
+nique
+putain
+pédale
+pédé
+pétasse
+salope
+trouduc
+zob
+
+# he - Hebrew
+arabush
+cushi
+
+# hi - Hindi
+chut
+penchod
+
+# hr - Croatian/Serbian
+kurac
+
+# it - Italian
+bagascia
+bocchinara
+bocchinaro
+bocchino
+cagare
+cazzata
+cazzo
+cazzone
+checca
+chiavare
+chiavata
+cogliona
+coglione
+culattone
+fanculo
+fica
+figa
+finocchio
+fottuto
+frocio
+inculare
+leccaculo
+merda
+mignotta
+minchia
+pompino
+puttana
+sborra
+sborrare
+scopare
+segaiolo
+stronza
+stronzo
+terrone
+troia
+trombare
+vaffanculo
+
+# ja - Japanese
+chankoro
+
+# nl - Dutch
+flikker
+kanker
+klootzak
+
+# no - Norwegian
+faen
+knulle
+kuksuger
+
+# pl - Polish
+chuj
+cipa
+dupa
+dziwka
+kurwa
+pierdol
+skurwysyn
+spierdalaj
+
+# pt - Portuguese
+boiola
+buceta
+
+# ro - Romanian
+bozgor
+muie
+
+# ru - Russian (Latin transliteration)
+bliad
+blya
+blyad
+blyadischa
+blyat
+chernozhopy
+chto za huy
+dolboeb
+dolboyob
+drochit
+ebalnik
+ebalo
+ebat
+eblan
+gandon
+goluboi
+govno
+hui
+khokhol
+mne pohui
+mudak
+opizdenet
+oslayob
+otpizdit
+otsosi
+pashla na hui
+petuh
+pidaras
+pidor
+pizda
+pizdato
+pizdets
+po huy
+poshol na hui
+posrat
+shalava
+shluha
+sosat
+sosi hui
+suka
+sukin syn
+svoloch
+trakhatsya
+ublyudok
+v pizdu
+yob tvoyu mat
+zaebal
+zaebis
+zalupa
+zasranec
+zavali yebalo
+zhid
+zhopa
+
+# sv - Swedish
+helvete
+
+# tr - Turkish
+amcik
+orospu
+
+# uk - Ukrainian (Latin transliteration)
+katsap
+moskal
+
+# zh - Cantonese/Chinese (romanized)
+gwailo
+gweilo

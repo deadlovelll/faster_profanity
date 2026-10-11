@@ -1,6 +1,6 @@
 #include <string>
 
-#include "text_lowerizer/text_lowerizer.hpp"
+#include "unicode_normalizer/unicode_normalizer.hpp"
 
 class TextNormalizer {
 public:
@@ -17,5 +17,5 @@ protected:
     std::string clean_obfuscated_word(const std::string& s, size_t start, size_t end);
     bool is_filler(char c);
 private:
-    TextLowerizer text_lowerizer;
+    UnicodeNormalizer unicode_normalizer;
 };
