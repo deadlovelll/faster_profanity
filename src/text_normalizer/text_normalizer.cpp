@@ -3,16 +3,10 @@
 #include <iostream>
 
 void TextNormalizer::normalize(std::string& text) {
-    to_lower(text);
+    text_lowerizer.lower(text);
     collapse_repeats(text);
     trim_word_boundaries(text);
     remove_letter_fillers(text);
-}
-
-void TextNormalizer::to_lower(std::string& text) {
-    for (char& c: text) {
-        c = std::tolower(static_cast<unsigned char>(c));
-    }
 }
 
 void TextNormalizer::collapse_repeats(std::string& text, int max_repeat) {
