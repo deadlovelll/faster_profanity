@@ -27,7 +27,14 @@ void UnicodeNormalizer::normalize(std::string& text) {
         }
 
         char32_t current = static_cast<char32_t>(code_point);
-        if (is_invisible(current)) {
+        CharKind kind = classify(current);
+        if (kind == CharKind::Invisible) {
+            pos += len;
+            continue;
+        }
+
+        if (kind == CharKind::Compatibility) {
+            append_compatibility_form(out, current);
             pos += len;
             continue;
         }
@@ -36,18 +43,64 @@ void UnicodeNormalizer::normalize(std::string& text) {
         if (lowered == current) {
             out.append(text, static_cast<std::size_t>(pos), static_cast<std::size_t>(len));
         } else {
-            utf8proc_uint8_t encoded[4];
-            utf8proc_ssize_t encoded_len = utf8proc_encode_char(static_cast<utf8proc_int32_t>(lowered), encoded);
-            out.append(reinterpret_cast<const char*>(encoded), static_cast<std::size_t>(encoded_len));
+            append_code_point(out, lowered);
         }
         pos += len;
     }
     text.swap(out);
 }
 
-// Сheck for invisible chars such as zero-width chars, soft hyphen, BOM, bidi controls,
-bool UnicodeNormalizer::is_invisible(char32_t code_point) {
-    return utf8proc_get_property(static_cast<utf8proc_int32_t>(code_point))->ignorable != 0;
+// One property lookup per character
+UnicodeNormalizer::CharKind UnicodeNormalizer::classify(char32_t code_point) {
+    const utf8proc_property_t* property = utf8proc_get_property(static_cast<utf8proc_int32_t>(code_point));
+    if (property->ignorable) {
+        return CharKind::Invisible;
+    }
+    if (property->decomp_type != 0) {
+        return CharKind::Compatibility;
+    }
+    return CharKind::Regular;
+}
+
+void UnicodeNormalizer::append_compatibility_form(std::string& out, char32_t code_point) {
+    // The longest compatibility decomposition is 18 code points (U+FDFA).
+    // 32 leaves headroom for future.
+    // See https://stackoverflow.com/questions/61779904
+    const utf8proc_ssize_t capacity = 32;
+    utf8proc_int32_t decomposed[capacity];
+    int boundclass = UTF8PROC_BOUNDCLASS_START;
+    utf8proc_ssize_t count = utf8proc_decompose_char(
+        static_cast<utf8proc_int32_t>(code_point), decomposed, capacity,
+        static_cast<utf8proc_option_t>(UTF8PROC_DECOMPOSE | UTF8PROC_COMPAT), &boundclass
+    );
+    if (count > 0 && count <= capacity) {
+        count = utf8proc_normalize_utf32(
+            decomposed, count, static_cast<utf8proc_option_t>(UTF8PROC_STABLE | UTF8PROC_COMPOSE)
+        );
+    }
+    if (count <= 0 || count > capacity) {
+        append_code_point(out, lower(code_point));
+        return;
+    }
+
+    // There can be cases that leave the parentheses:
+    // - ⑽ ... ⒇ (U+247D-U+2487) -> "(10)" ... "(20)"
+    // - ㈝ (U+321D) -> "(오전)"
+    // - ㈞ (U+321E) -> "(오후)"
+    if (count == 3 && decomposed[0] == '(' && decomposed[2] == ')') {
+        decomposed[0] = decomposed[1];
+        count = 1;
+    }
+
+    for (utf8proc_ssize_t i = 0; i < count; ++i) {
+        append_code_point(out, lower(static_cast<char32_t>(decomposed[i])));
+    }
+}
+
+void UnicodeNormalizer::append_code_point(std::string& out, char32_t code_point) {
+    utf8proc_uint8_t encoded[4];
+    utf8proc_ssize_t encoded_len = utf8proc_encode_char(static_cast<utf8proc_int32_t>(code_point), encoded);
+    out.append(reinterpret_cast<const char*>(encoded), static_cast<std::size_t>(encoded_len));
 }
 
 char32_t UnicodeNormalizer::lower(char32_t code_point) {

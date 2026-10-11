@@ -19,6 +19,7 @@ add_library(faster_profanity_lib
     src/trie_loader/trie_loader.cpp
     src/utf8_sizer/utf8_sizer.cpp
     src/text_normalizer/text_normalizer.cpp
+    src/unicode_normalizer/unicode_normalizer.cpp
 )
 
 target_include_directories(faster_profanity_lib
@@ -28,7 +29,9 @@ target_include_directories(faster_profanity_lib
 
 target_link_libraries(faster_profanity_lib
     PUBLIC
-        pybind11::module 
+        pybind11::module
+    PRIVATE
+        utf8proc
 )
 
 add_executable(faster_profanity
@@ -50,8 +53,15 @@ FetchContent_Declare(
     GIT_TAG        v2.11.1  
 )
 
+FetchContent_Declare(
+    utf8proc
+    GIT_REPOSITORY https://github.com/JuliaStrings/utf8proc.git
+    GIT_TAG        v2.11.3
+)
+
 FetchContent_MakeAvailable(pybind11)
 FetchContent_MakeAvailable(googletest)
+FetchContent_MakeAvailable(utf8proc)
 
 enable_testing()
 add_subdirectory(tests)

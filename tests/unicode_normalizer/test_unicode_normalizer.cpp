@@ -83,10 +83,10 @@ TEST_F(UnicodeNormalizerTest, ByteLengthChanges) {
     EXPECT_EQ(text, "ⱥ");
 }
 
-TEST_F(UnicodeNormalizerTest, FullwidthLettersAreLoweredNotFolded) {
-    std::string text = "ＦＵＣＫ";
+TEST_F(UnicodeNormalizerTest, FullwidthLetters) {
+    std::string text = "ＦＵＣＫ ｆｕｃｋ";
     normalizer.normalize(text);
-    EXPECT_EQ(text, "ｆｕｃｋ");
+    EXPECT_EQ(text, "fuck fuck");
 }
 
 TEST_F(UnicodeNormalizerTest, EmojiAndCjkUnchanged) {
@@ -224,11 +224,10 @@ TEST_F(UnicodeNormalizerTest, EmojiVariationSelectorRemoved) {
     EXPECT_EQ(text, "❤");
 }
 
-TEST_F(UnicodeNormalizerTest, WhitespaceAndNoBreakSpaceKept) {
-    std::string text = "a b\tc\nd e";
-    std::string expected = text;
+TEST_F(UnicodeNormalizerTest, WhitespaceKeptNoBreakSpaceBecomesSpace) {
+    std::string text = "a b\tc\nd\u00A0e";
     normalizer.normalize(text);
-    EXPECT_EQ(text, expected);
+    EXPECT_EQ(text, "a b\tc\nd e");
 }
 
 TEST_F(UnicodeNormalizerTest, InvisibleCharsInsideUppercaseLatin) {
@@ -241,4 +240,82 @@ TEST_F(UnicodeNormalizerTest, InvisibleCharsInsideUppercaseCyrillic) {
     std::string text = "\uFEFFСУ\u200BКА\u202E";
     normalizer.normalize(text);
     EXPECT_EQ(text, "сука");
+}
+
+TEST_F(UnicodeNormalizerTest, MathematicalBoldItalicScript) {
+    std::string text = "𝐟𝐮𝐜𝐤 𝙛𝙪𝙘𝙠 𝓯𝓾𝓬𝓴";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "fuck fuck fuck");
+}
+
+TEST_F(UnicodeNormalizerTest, MathematicalFrakturDoubleStruckMonospace) {
+    std::string text = "𝔣𝔲𝔠𝔨 𝕗𝕦𝕔𝕜 𝚏𝚞𝚌𝚔";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "fuck fuck fuck");
+}
+
+TEST_F(UnicodeNormalizerTest, MathematicalBoldCapitalsAreLowered) {
+    std::string text = "𝐅𝐔𝐂𝐊";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "fuck");
+}
+
+TEST_F(UnicodeNormalizerTest, CircledLetters) {
+    std::string text = "ⓕⓤⓒⓚ ⒻⓊⒸⓀ";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "fuck fuck");
+}
+
+TEST_F(UnicodeNormalizerTest, SquaredLetters) {
+    std::string text = "🄵🅄🄲🄺";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "fuck");
+}
+
+TEST_F(UnicodeNormalizerTest, ParenthesizedLettersLoseParentheses) {
+    std::string text = "⒡⒰⒞⒦ 🄕🄤🄒🄚";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "fuck fuck");
+}
+
+TEST_F(UnicodeNormalizerTest, ParenthesizedMultiDigitNumberKept) {
+    std::string text = "⑽";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "(10)");
+}
+
+TEST_F(UnicodeNormalizerTest, SuperscriptModifierLetters) {
+    std::string text = "ᶠᵘᶜᵏ";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "fuck");
+}
+
+TEST_F(UnicodeNormalizerTest, Ligatures) {
+    std::string text = "ﬁnger ﬀ ﬆ";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "finger ff st");
+}
+
+TEST_F(UnicodeNormalizerTest, MiscCompatibilitySymbols) {
+    std::string text = "™ ½ ㎏ Ⅳ ① ℌ ſ …";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "tm 1\u20442 kg iv 1 h s ...");
+}
+
+TEST_F(UnicodeNormalizerTest, SpecialSpacesBecomeSpace) {
+    std::string text = "a\u2002b\u3000c";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "a b c");
+}
+
+TEST_F(UnicodeNormalizerTest, CompatibilityLettersWithInvisibleChars) {
+    std::string text = "Ｓ\u200BＨ\u00ADＩＴ";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "shit");
+}
+
+TEST_F(UnicodeNormalizerTest, TitlecaseDigraphKeepsComposedCaron) {
+    std::string text = "ǅ";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "d\u017E");
 }
