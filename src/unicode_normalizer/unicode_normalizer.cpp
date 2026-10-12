@@ -27,7 +27,7 @@ void UnicodeNormalizer::normalize(std::string& text) {
         }
 
         char32_t current = static_cast<char32_t>(code_point);
-        CharKind kind = classify(current);
+        CharKind kind = char_classifier.classify(current);
         if (kind == CharKind::Invisible) {
             pos += len;
             continue;
@@ -45,6 +45,12 @@ void UnicodeNormalizer::normalize(std::string& text) {
             continue;
         }
 
+        if (kind == CharKind::Diacritic) {
+            append_without_diacritics(out, current);
+            pos += len;
+            continue;
+        }
+
         char32_t lowered = lower(current);
         if (lowered == current) {
             out.append(text, static_cast<std::size_t>(pos), static_cast<std::size_t>(len));
@@ -54,22 +60,6 @@ void UnicodeNormalizer::normalize(std::string& text) {
         pos += len;
     }
     text.swap(out);
-}
-
-// One property lookup per character
-UnicodeNormalizer::CharKind UnicodeNormalizer::classify(char32_t code_point) {
-    const utf8proc_property_t* property = utf8proc_get_property(static_cast<utf8proc_int32_t>(code_point));
-    if (property->ignorable) {
-        return CharKind::Invisible;
-    }
-    if (property->decomp_type != 0) {
-        return CharKind::Compatibility;
-    }
-    // Fold differs from lowercase: ß -> ss
-    if (property->casefold_seqindex != property->lowercase_seqindex) {
-        return CharKind::CaseFolding;
-    }
-    return CharKind::Regular;
 }
 
 void UnicodeNormalizer::append_compatibility_form(std::string& out, char32_t code_point) {
@@ -127,6 +117,14 @@ void UnicodeNormalizer::append_case_folded(std::string& out, char32_t code_point
 
     for (utf8proc_ssize_t i = 0; i < count; ++i) {
         append_code_point(out, static_cast<char32_t>(folded[i]));
+    }
+}
+
+void UnicodeNormalizer::append_without_diacritics(std::string& out, char32_t code_point) {
+    char32_t stripped[4];
+    int count = diacritics_stripper.strip(code_point, stripped);
+    for (int i = 0; i < count; ++i) {
+        append_code_point(out, stripped[i]);
     }
 }
 

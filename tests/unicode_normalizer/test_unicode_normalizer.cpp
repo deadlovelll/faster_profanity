@@ -58,16 +58,16 @@ TEST_F(UnicodeNormalizerTest, CyrillicAndLatinMixed) {
     EXPECT_EQ(text, "привет world");
 }
 
-TEST_F(UnicodeNormalizerTest, LatinWithDiacriticsKeepsDiacritics) {
+TEST_F(UnicodeNormalizerTest, LatinDiacriticsStripped) {
     std::string text = "ÜBER ÇA ÉTÉ";
     normalizer.normalize(text);
-    EXPECT_EQ(text, "über ça été");
+    EXPECT_EQ(text, "uber ca ete");
 }
 
 TEST_F(UnicodeNormalizerTest, Greek) {
     std::string text = "ΣΟΦΊΑ";
     normalizer.normalize(text);
-    EXPECT_EQ(text, "σοφία");
+    EXPECT_EQ(text, "σοφια");
 }
 
 TEST_F(UnicodeNormalizerTest, TurkishDottedCapitalI) {
@@ -335,7 +335,7 @@ TEST_F(UnicodeNormalizerTest, SharpSInsideWords) {
 TEST_F(UnicodeNormalizerTest, GreekFinalSigma) {
     std::string text = "ΚΟΣΜΟΣ κόσμος";
     normalizer.normalize(text);
-    EXPECT_EQ(text, "κοσμοσ κόσμοσ");
+    EXPECT_EQ(text, "κοσμοσ κοσμοσ");
 }
 
 TEST_F(UnicodeNormalizerTest, GreekCapitalWithProsgegrammeni) {
@@ -351,7 +351,67 @@ TEST_F(UnicodeNormalizerTest, CherokeeFoldsToCapitals) {
 }
 
 TEST_F(UnicodeNormalizerTest, KelvinAndAngstromSigns) {
-    std::string text = "K Å";
+    std::string text = "\u212A \u212B";
     normalizer.normalize(text);
-    EXPECT_EQ(text, "k å");
+    EXPECT_EQ(text, "k a");
+}
+
+TEST_F(UnicodeNormalizerTest, AccentedObfuscation) {
+    std::string text = "fùck fúck fûck fück fŭck fǔck";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "fuck fuck fuck fuck fuck fuck");
+}
+
+TEST_F(UnicodeNormalizerTest, MultipleMarksOnOneLetter) {
+    std::string text = "ǖ ǛȐ";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "u ur");
+}
+
+TEST_F(UnicodeNormalizerTest, CyrillicYoBecomesYe) {
+    std::string text = "ЁБАНЫЙ ёб";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "ебаный еб");
+}
+
+TEST_F(UnicodeNormalizerTest, CyrillicLettersWithMarkKept) {
+    std::string text = "хуй ХУЙ ў Ў ї Ї";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "хуй хуй ў ў ї ї");
+}
+
+TEST_F(UnicodeNormalizerTest, StrikethroughAndUnderline) {
+    std::string text = "f\u0336u\u0336c\u0336k\u0336 s\u0332h\u0332i\u0332t\u0332";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "fuck shit");
+}
+
+TEST_F(UnicodeNormalizerTest, ZalgoText) {
+    std::string text = "f\u0315\u0321\u0358u\u035Ec\u0489\u0483k";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "fuck");
+}
+
+TEST_F(UnicodeNormalizerTest, DecomposedAccentsStripped) {
+    std::string text = "fu\u0300ck E\u0301TE\u0301";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "fuck ete");
+}
+
+TEST_F(UnicodeNormalizerTest, IndicMarksKept) {
+    std::string text = "चूतिया क़";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "चूतिया क़");
+}
+
+TEST_F(UnicodeNormalizerTest, HangulUnchanged) {
+    std::string text = "한국어";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "한국어");
+}
+
+TEST_F(UnicodeNormalizerTest, ChurchSlavonicCombiningMarks) {
+    std::string text = "сⷠу꙰к꙼аꚞ";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "сука");
 }
