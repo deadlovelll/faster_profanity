@@ -1,4 +1,5 @@
 #include "unicode_normalizer/unicode_normalizer.hpp"
+#include "confusables_mapper/confusables_mapper.hpp"
 
 #include <utf8proc.h>
 
@@ -51,6 +52,14 @@ void UnicodeNormalizer::normalize(std::string& text) {
             continue;
         }
 
+        // Checked before lowering: some letters look Latin only in uppercase, Cyrillic В -> b
+        char latin = ConfusablesMapper::to_latin(current);
+        if (latin != 0) {
+            out.push_back(latin);
+            pos += len;
+            continue;
+        }
+
         char32_t lowered = lower(current);
         if (lowered == current) {
             out.append(text, static_cast<std::size_t>(pos), static_cast<std::size_t>(len));
@@ -68,7 +77,7 @@ void UnicodeNormalizer::append_compatibility_form(std::string& out, char32_t cod
     // See https://stackoverflow.com/questions/61779904
     const utf8proc_ssize_t capacity = 32;
     utf8proc_int32_t decomposed[capacity];
-    int boundclass = UTF8PROC_BOUNDCLASS_START;
+    utf8proc_int32_t boundclass = UTF8PROC_BOUNDCLASS_START;
     utf8proc_ssize_t count = utf8proc_decompose_char(
         static_cast<utf8proc_int32_t>(code_point), decomposed, capacity,
         static_cast<utf8proc_option_t>(UTF8PROC_DECOMPOSE | UTF8PROC_COMPAT), &boundclass
@@ -101,7 +110,7 @@ void UnicodeNormalizer::append_case_folded(std::string& out, char32_t code_point
     // The longest full case folding is 3 code points (ΐ)
     const utf8proc_ssize_t capacity = 4;
     utf8proc_int32_t folded[capacity];
-    int boundclass = UTF8PROC_BOUNDCLASS_START;
+    utf8proc_int32_t boundclass = UTF8PROC_BOUNDCLASS_START;
     utf8proc_ssize_t count = utf8proc_decompose_char(
         static_cast<utf8proc_int32_t>(lower(code_point)), folded, capacity, UTF8PROC_CASEFOLD, &boundclass
     );
@@ -129,6 +138,15 @@ void UnicodeNormalizer::append_without_diacritics(std::string& out, char32_t cod
 }
 
 void UnicodeNormalizer::append_code_point(std::string& out, char32_t code_point) {
+    if (code_point < 0x80) {
+        out.push_back(static_cast<char>(code_point));
+        return;
+    }
+    char latin = ConfusablesMapper::to_latin(code_point);
+    if (latin != 0) {
+        out.push_back(latin);
+        return;
+    }
     utf8proc_uint8_t encoded[4];
     utf8proc_ssize_t encoded_len = utf8proc_encode_char(static_cast<utf8proc_int32_t>(code_point), encoded);
     out.append(reinterpret_cast<const char*>(encoded), static_cast<std::size_t>(encoded_len));

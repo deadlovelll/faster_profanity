@@ -1,0 +1,420 @@
+#pragma once
+
+#include <array>
+
+struct Confusable {
+    char32_t code_point;
+    char latin;
+};
+
+// Generated from https://www.unicode.org/Public/18.0.0/security/confusables.txt
+inline constexpr std::array<Confusable, 408> confusables = {{
+    {0x00FE, 'p'},    // þ LATIN SMALL LETTER THORN
+    {0x0131, 'i'},    // ı LATIN SMALL LETTER DOTLESS I
+    {0x0184, 'b'},    // Ƅ LATIN CAPITAL LETTER TONE SIX
+    {0x018D, 'g'},    // ƍ LATIN SMALL LETTER TURNED DELTA
+    {0x0192, 'f'},    // ƒ LATIN SMALL LETTER F WITH HOOK
+    {0x0196, 'i'},    // Ɩ LATIN CAPITAL LETTER IOTA (confusables.txt: l)
+    {0x01A6, 'r'},    // Ʀ LATIN LETTER YR
+    {0x01BD, 's'},    // ƽ LATIN SMALL LETTER TONE FIVE
+    {0x01BF, 'p'},    // ƿ LATIN LETTER WYNN
+    {0x01C0, 'l'},    // ǀ LATIN LETTER DENTAL CLICK
+    {0x0237, 'j'},    // ȷ LATIN SMALL LETTER DOTLESS J
+    {0x024C, 'r'},    // Ɍ LATIN CAPITAL LETTER R WITH STROKE
+    {0x0251, 'a'},    // ɑ LATIN SMALL LETTER ALPHA
+    {0x0261, 'g'},    // ɡ LATIN SMALL LETTER SCRIPT G
+    {0x0263, 'y'},    // ɣ LATIN SMALL LETTER GAMMA
+    {0x0269, 'i'},    // ɩ LATIN SMALL LETTER IOTA
+    {0x026A, 'i'},    // ɪ LATIN LETTER SMALL CAPITAL I
+    {0x026F, 'w'},    // ɯ LATIN SMALL LETTER TURNED M
+    {0x0284, 'f'},    // ʄ LATIN SMALL LETTER DOTLESS J WITH STROKE AND HOOK
+    {0x028B, 'u'},    // ʋ LATIN SMALL LETTER V WITH HOOK
+    {0x028F, 'y'},    // ʏ LATIN LETTER SMALL CAPITAL Y
+    {0x037F, 'j'},    // Ϳ GREEK CAPITAL LETTER YOT
+    {0x0391, 'a'},    // Α GREEK CAPITAL LETTER ALPHA
+    {0x0392, 'b'},    // Β GREEK CAPITAL LETTER BETA
+    {0x0395, 'e'},    // Ε GREEK CAPITAL LETTER EPSILON
+    {0x0396, 'z'},    // Ζ GREEK CAPITAL LETTER ZETA
+    {0x0397, 'h'},    // Η GREEK CAPITAL LETTER ETA
+    {0x0399, 'i'},    // Ι GREEK CAPITAL LETTER IOTA (confusables.txt: l)
+    {0x039A, 'k'},    // Κ GREEK CAPITAL LETTER KAPPA
+    {0x039C, 'm'},    // Μ GREEK CAPITAL LETTER MU
+    {0x039D, 'n'},    // Ν GREEK CAPITAL LETTER NU
+    {0x039F, 'o'},    // Ο GREEK CAPITAL LETTER OMICRON
+    {0x03A1, 'p'},    // Ρ GREEK CAPITAL LETTER RHO
+    {0x03A4, 't'},    // Τ GREEK CAPITAL LETTER TAU
+    {0x03A5, 'y'},    // Υ GREEK CAPITAL LETTER UPSILON
+    {0x03A7, 'x'},    // Χ GREEK CAPITAL LETTER CHI
+    {0x03B1, 'a'},    // α GREEK SMALL LETTER ALPHA
+    {0x03B3, 'y'},    // γ GREEK SMALL LETTER GAMMA
+    {0x03B9, 'i'},    // ι GREEK SMALL LETTER IOTA
+    {0x03BD, 'v'},    // ν GREEK SMALL LETTER NU
+    {0x03BF, 'o'},    // ο GREEK SMALL LETTER OMICRON
+    {0x03C1, 'p'},    // ρ GREEK SMALL LETTER RHO
+    {0x03C3, 'o'},    // σ GREEK SMALL LETTER SIGMA
+    {0x03C5, 'u'},    // υ GREEK SMALL LETTER UPSILON
+    {0x03DC, 'f'},    // Ϝ GREEK LETTER DIGAMMA
+    {0x03ED, 'o'},    // ϭ COPTIC SMALL LETTER SHIMA
+    {0x03F3, 'j'},    // ϳ GREEK LETTER YOT
+    {0x03F8, 'p'},    // ϸ GREEK SMALL LETTER SHO
+    {0x03FA, 'm'},    // Ϻ GREEK CAPITAL LETTER SAN
+    {0x0405, 's'},    // Ѕ CYRILLIC CAPITAL LETTER DZE
+    {0x0406, 'i'},    // І CYRILLIC CAPITAL LETTER BYELORUSSIAN-UKRAINIAN I (confusables.txt: l)
+    {0x0408, 'j'},    // Ј CYRILLIC CAPITAL LETTER JE
+    {0x0410, 'a'},    // А CYRILLIC CAPITAL LETTER A
+    {0x0412, 'b'},    // В CYRILLIC CAPITAL LETTER VE
+    {0x0415, 'e'},    // Е CYRILLIC CAPITAL LETTER IE
+    {0x041A, 'k'},    // К CYRILLIC CAPITAL LETTER KA
+    {0x041C, 'm'},    // М CYRILLIC CAPITAL LETTER EM
+    {0x041D, 'h'},    // Н CYRILLIC CAPITAL LETTER EN
+    {0x041E, 'o'},    // О CYRILLIC CAPITAL LETTER O
+    {0x0420, 'p'},    // Р CYRILLIC CAPITAL LETTER ER
+    {0x0421, 'c'},    // С CYRILLIC CAPITAL LETTER ES
+    {0x0422, 't'},    // Т CYRILLIC CAPITAL LETTER TE
+    {0x0423, 'y'},    // У CYRILLIC CAPITAL LETTER U
+    {0x0425, 'x'},    // Х CYRILLIC CAPITAL LETTER HA
+    {0x042C, 'b'},    // Ь CYRILLIC CAPITAL LETTER SOFT SIGN
+    {0x0430, 'a'},    // а CYRILLIC SMALL LETTER A
+    {0x0433, 'r'},    // г CYRILLIC SMALL LETTER GHE
+    {0x0435, 'e'},    // е CYRILLIC SMALL LETTER IE
+    {0x043E, 'o'},    // о CYRILLIC SMALL LETTER O
+    {0x0440, 'p'},    // р CYRILLIC SMALL LETTER ER
+    {0x0441, 'c'},    // с CYRILLIC SMALL LETTER ES
+    {0x0443, 'y'},    // у CYRILLIC SMALL LETTER U
+    {0x0445, 'x'},    // х CYRILLIC SMALL LETTER HA
+    {0x0448, 'w'},    // ш CYRILLIC SMALL LETTER SHA
+    {0x0455, 's'},    // ѕ CYRILLIC SMALL LETTER DZE
+    {0x0456, 'i'},    // і CYRILLIC SMALL LETTER BYELORUSSIAN-UKRAINIAN I
+    {0x0458, 'j'},    // ј CYRILLIC SMALL LETTER JE
+    {0x0461, 'w'},    // ѡ CYRILLIC SMALL LETTER OMEGA
+    {0x0474, 'v'},    // Ѵ CYRILLIC CAPITAL LETTER IZHITSA
+    {0x0475, 'v'},    // ѵ CYRILLIC SMALL LETTER IZHITSA
+    {0x04AE, 'y'},    // Ү CYRILLIC CAPITAL LETTER STRAIGHT U
+    {0x04AF, 'y'},    // ү CYRILLIC SMALL LETTER STRAIGHT U
+    {0x04BA, 'h'},    // Һ CYRILLIC CAPITAL LETTER SHHA
+    {0x04BB, 'h'},    // һ CYRILLIC SMALL LETTER SHHA
+    {0x04BD, 'e'},    // ҽ CYRILLIC SMALL LETTER ABKHASIAN CHE
+    {0x04C0, 'i'},    // Ӏ CYRILLIC LETTER PALOCHKA (confusables.txt: l)
+    {0x04CF, 'l'},    // ӏ CYRILLIC SMALL LETTER PALOCHKA
+    {0x0501, 'd'},    // ԁ CYRILLIC SMALL LETTER KOMI DE
+    {0x050C, 'g'},    // Ԍ CYRILLIC CAPITAL LETTER KOMI SJE
+    {0x051A, 'q'},    // Ԛ CYRILLIC CAPITAL LETTER QA
+    {0x051B, 'q'},    // ԛ CYRILLIC SMALL LETTER QA
+    {0x051C, 'w'},    // Ԝ CYRILLIC CAPITAL LETTER WE
+    {0x051D, 'w'},    // ԝ CYRILLIC SMALL LETTER WE
+    {0x054D, 'u'},    // Ս ARMENIAN CAPITAL LETTER SEH
+    {0x054F, 's'},    // Տ ARMENIAN CAPITAL LETTER TIWN
+    {0x0555, 'o'},    // Օ ARMENIAN CAPITAL LETTER OH
+    {0x0561, 'w'},    // ա ARMENIAN SMALL LETTER AYB
+    {0x0563, 'q'},    // գ ARMENIAN SMALL LETTER GIM
+    {0x0566, 'q'},    // զ ARMENIAN SMALL LETTER ZA
+    {0x0570, 'h'},    // հ ARMENIAN SMALL LETTER HO
+    {0x0575, 'j'},    // յ ARMENIAN SMALL LETTER YI
+    {0x0578, 'n'},    // ո ARMENIAN SMALL LETTER VO
+    {0x057C, 'n'},    // ռ ARMENIAN SMALL LETTER RA
+    {0x057D, 'u'},    // ս ARMENIAN SMALL LETTER SEH
+    {0x0581, 'g'},    // ց ARMENIAN SMALL LETTER CO
+    {0x0582, 'i'},    // ւ ARMENIAN SMALL LETTER YIWN
+    {0x0584, 'f'},    // ք ARMENIAN SMALL LETTER KEH
+    {0x0585, 'o'},    // օ ARMENIAN SMALL LETTER OH
+    {0x05D5, 'l'},    // HEBREW LETTER VAV
+    {0x05D8, 'v'},    // HEBREW LETTER TET
+    {0x05DF, 'l'},    // HEBREW LETTER FINAL NUN
+    {0x05E1, 'o'},    // HEBREW LETTER SAMEKH
+    {0x0627, 'l'},    // ARABIC LETTER ALEF
+    {0x0647, 'o'},    // ARABIC LETTER HEH
+    {0x06BE, 'o'},    // ARABIC LETTER HEH DOACHASHMEE
+    {0x06C1, 'o'},    // ARABIC LETTER HEH GOAL
+    {0x06D5, 'o'},    // ARABIC LETTER AE
+    {0x07CA, 'l'},    // NKO LETTER A
+    {0x07CB, 'o'},    // NKO LETTER EE
+    {0x07CC, 'y'},    // NKO LETTER I
+    {0x07D3, 'f'},    // NKO LETTER BA
+    {0x07D5, 'b'},    // NKO LETTER TA
+    {0x07E0, 't'},    // NKO LETTER NA WOLOSO
+    {0x0840, 'o'},    // MANDAIC LETTER HALQA
+    {0x0B20, 'o'},    // ଠ ORIYA LETTER TTHA
+    {0x0D1F, 's'},    // ട MALAYALAM LETTER TTA
+    {0x0D20, 'o'},    // ഠ MALAYALAM LETTER TTHA
+    {0x1004, 'c'},    // င MYANMAR LETTER NGA
+    {0x101D, 'o'},    // ဝ MYANMAR LETTER WA
+    {0x105A, 'c'},    // ၚ MYANMAR LETTER MON NGA
+    {0x10B9, 'h'},    // Ⴙ GEORGIAN CAPITAL LETTER CHIN
+    {0x10BD, 's'},    // Ⴝ GEORGIAN CAPITAL LETTER CHAR
+    {0x10CD, 'z'},    // Ⴭ GEORGIAN CAPITAL LETTER AEN
+    {0x10E7, 'y'},    // ყ GEORGIAN LETTER QAR
+    {0x10FD, 's'},    // ჽ GEORGIAN LETTER AEN
+    {0x10FF, 'o'},    // ჿ GEORGIAN LETTER LABIAL SIGN
+    {0x110B, 'o'},    // ᄋ HANGUL CHOSEONG IEUNG
+    {0x11BC, 'o'},    // ᆼ HANGUL JONGSEONG IEUNG
+    {0x1200, 'u'},    // ሀ ETHIOPIC SYLLABLE HA
+    {0x12D0, 'o'},    // ዐ ETHIOPIC SYLLABLE PHARYNGEAL A
+    {0x13A0, 'd'},    // Ꭰ CHEROKEE LETTER A
+    {0x13A1, 'r'},    // Ꭱ CHEROKEE LETTER E
+    {0x13A2, 't'},    // Ꭲ CHEROKEE LETTER I
+    {0x13A5, 'i'},    // Ꭵ CHEROKEE LETTER V
+    {0x13A9, 'y'},    // Ꭹ CHEROKEE LETTER GI
+    {0x13AA, 'a'},    // Ꭺ CHEROKEE LETTER GO
+    {0x13AB, 'j'},    // Ꭻ CHEROKEE LETTER GU
+    {0x13AC, 'e'},    // Ꭼ CHEROKEE LETTER GV
+    {0x13B3, 'w'},    // Ꮃ CHEROKEE LETTER LA
+    {0x13B7, 'm'},    // Ꮇ CHEROKEE LETTER LU
+    {0x13BB, 'h'},    // Ꮋ CHEROKEE LETTER MI
+    {0x13BD, 'y'},    // Ꮍ CHEROKEE LETTER MU
+    {0x13C0, 'g'},    // Ꮐ CHEROKEE LETTER NAH
+    {0x13C2, 'h'},    // Ꮒ CHEROKEE LETTER NI
+    {0x13C3, 'z'},    // Ꮓ CHEROKEE LETTER NO
+    {0x13CF, 'b'},    // Ꮟ CHEROKEE LETTER SI
+    {0x13D2, 'r'},    // Ꮢ CHEROKEE LETTER SV
+    {0x13D4, 'w'},    // Ꮤ CHEROKEE LETTER TA
+    {0x13D5, 's'},    // Ꮥ CHEROKEE LETTER DE
+    {0x13D9, 'v'},    // Ꮩ CHEROKEE LETTER DO
+    {0x13DA, 's'},    // Ꮪ CHEROKEE LETTER DU
+    {0x13DE, 'l'},    // Ꮮ CHEROKEE LETTER TLE
+    {0x13DF, 'c'},    // Ꮯ CHEROKEE LETTER TLI
+    {0x13E2, 'p'},    // Ꮲ CHEROKEE LETTER TLV
+    {0x13E6, 'k'},    // Ꮶ CHEROKEE LETTER TSO
+    {0x13E7, 'd'},    // Ꮷ CHEROKEE LETTER TSU
+    {0x13F3, 'g'},    // Ᏻ CHEROKEE LETTER YU
+    {0x13F4, 'b'},    // Ᏼ CHEROKEE LETTER YV
+    {0x142F, 'v'},    // ᐯ CANADIAN SYLLABICS PE
+    {0x144C, 'u'},    // ᑌ CANADIAN SYLLABICS TE
+    {0x146D, 'p'},    // ᑭ CANADIAN SYLLABICS KI
+    {0x146F, 'd'},    // ᑯ CANADIAN SYLLABICS KO
+    {0x1472, 'b'},    // ᑲ CANADIAN SYLLABICS KA
+    {0x148D, 'j'},    // ᒍ CANADIAN SYLLABICS CO
+    {0x14AA, 'l'},    // ᒪ CANADIAN SYLLABICS MA
+    {0x1541, 'x'},    // ᕁ CANADIAN SYLLABICS SAYISI YI
+    {0x157C, 'h'},    // ᕼ CANADIAN SYLLABICS NUNAVUT H
+    {0x157D, 'x'},    // ᕽ CANADIAN SYLLABICS HK
+    {0x1587, 'r'},    // ᖇ CANADIAN SYLLABICS TLHI
+    {0x15AF, 'b'},    // ᖯ CANADIAN SYLLABICS AIVILIK B
+    {0x15B4, 'f'},    // ᖴ CANADIAN SYLLABICS BLACKFOOT WE
+    {0x15C5, 'a'},    // ᗅ CANADIAN SYLLABICS CARRIER GHO
+    {0x15DE, 'd'},    // ᗞ CANADIAN SYLLABICS CARRIER THE
+    {0x15EA, 'd'},    // ᗪ CANADIAN SYLLABICS CARRIER PE
+    {0x15F0, 'm'},    // ᗰ CANADIAN SYLLABICS CARRIER GO
+    {0x15F7, 'b'},    // ᗷ CANADIAN SYLLABICS CARRIER KHE
+    {0x16B7, 'x'},    // ᚷ RUNIC LETTER GEBO GYFU G
+    {0x16C1, 'l'},    // ᛁ RUNIC LETTER ISAZ IS ISS I
+    {0x16D0, 'l'},    // ᛐ RUNIC LETTER SHORT-TWIG-TYR T
+    {0x16D5, 'k'},    // ᛕ RUNIC LETTER OPEN-P
+    {0x16D6, 'm'},    // ᛖ RUNIC LETTER EHWAZ EH E
+    {0x1763, 'x'},    // ᝣ TAGBANWA LETTER KA
+    {0x1A45, 'o'},    // ᩅ TAI THAM LETTER WA
+    {0x1CBD, 's'},    // Ჽ GEORGIAN MTAVRULI CAPITAL LETTER AEN
+    {0x1CBF, 'o'},    // Ჿ GEORGIAN MTAVRULI CAPITAL LETTER LABIAL SIGN
+    {0x1CF5, 'x'},    // ᳵ VEDIC SIGN JIHVAMULIYA
+    {0x1D04, 'c'},    // ᴄ LATIN LETTER SMALL CAPITAL C
+    {0x1D0F, 'o'},    // ᴏ LATIN LETTER SMALL CAPITAL O
+    {0x1D11, 'o'},    // ᴑ LATIN SMALL LETTER SIDEWAYS O
+    {0x1D1C, 'u'},    // ᴜ LATIN LETTER SMALL CAPITAL U
+    {0x1D20, 'v'},    // ᴠ LATIN LETTER SMALL CAPITAL V
+    {0x1D21, 'w'},    // ᴡ LATIN LETTER SMALL CAPITAL W
+    {0x1D22, 'z'},    // ᴢ LATIN LETTER SMALL CAPITAL Z
+    {0x1D26, 'r'},    // ᴦ GREEK LETTER SMALL CAPITAL GAMMA
+    {0x1D83, 'g'},    // ᶃ LATIN SMALL LETTER G WITH PALATAL HOOK
+    {0x1D8C, 'y'},    // ᶌ LATIN SMALL LETTER V WITH PALATAL HOOK
+    {0x1E9D, 'f'},    // ẝ LATIN SMALL LETTER LONG S WITH HIGH STROKE
+    {0x1EFF, 'y'},    // ỿ LATIN SMALL LETTER Y WITH LOOP
+    {0x2C6B, 'z'},    // Ⱬ LATIN CAPITAL LETTER Z WITH DESCENDER
+    {0x2C6C, 'z'},    // ⱬ LATIN SMALL LETTER Z WITH DESCENDER
+    {0x2C82, 'b'},    // Ⲃ COPTIC CAPITAL LETTER VIDA
+    {0x2C85, 'r'},    // ⲅ COPTIC SMALL LETTER GAMMA
+    {0x2C8C, 'z'},    // Ⲍ COPTIC CAPITAL LETTER ZATA
+    {0x2C8D, 'z'},    // ⲍ COPTIC SMALL LETTER ZATA
+    {0x2C8E, 'h'},    // Ⲏ COPTIC CAPITAL LETTER HATE
+    {0x2C92, 'i'},    // Ⲓ COPTIC CAPITAL LETTER IAUDA (confusables.txt: l)
+    {0x2C93, 'i'},    // ⲓ COPTIC SMALL LETTER IAUDA
+    {0x2C94, 'k'},    // Ⲕ COPTIC CAPITAL LETTER KAPA
+    {0x2C98, 'm'},    // Ⲙ COPTIC CAPITAL LETTER MI
+    {0x2C9A, 'n'},    // Ⲛ COPTIC CAPITAL LETTER NI
+    {0x2C9E, 'o'},    // Ⲟ COPTIC CAPITAL LETTER O
+    {0x2C9F, 'o'},    // ⲟ COPTIC SMALL LETTER O
+    {0x2CA2, 'p'},    // Ⲣ COPTIC CAPITAL LETTER RO
+    {0x2CA3, 'p'},    // ⲣ COPTIC SMALL LETTER RO
+    {0x2CA4, 'c'},    // Ⲥ COPTIC CAPITAL LETTER SIMA
+    {0x2CA5, 'c'},    // ⲥ COPTIC SMALL LETTER SIMA
+    {0x2CA6, 't'},    // Ⲧ COPTIC CAPITAL LETTER TAU
+    {0x2CA8, 'y'},    // Ⲩ COPTIC CAPITAL LETTER UA
+    {0x2CA9, 'y'},    // ⲩ COPTIC SMALL LETTER UA
+    {0x2CAC, 'x'},    // Ⲭ COPTIC CAPITAL LETTER KHI
+    {0x2CBD, 'w'},    // ⲽ COPTIC SMALL LETTER CRYPTOGRAMMIC NI
+    {0x2CCE, 'p'},    // Ⳏ COPTIC CAPITAL LETTER OLD COPTIC HA
+    {0x2CCF, 'p'},    // ⳏ COPTIC SMALL LETTER OLD COPTIC HA
+    {0x2CD0, 'l'},    // Ⳑ COPTIC CAPITAL LETTER L-SHAPED HA
+    {0x2D2D, 'z'},    // ⴭ GEORGIAN SMALL LETTER AEN
+    {0x2D38, 'v'},    // ⴸ TIFINAGH LETTER YADH
+    {0x2D39, 'e'},    // ⴹ TIFINAGH LETTER YADD
+    {0x2D4A, 'l'},    // ⵊ TIFINAGH LETTER YAZH
+    {0x2D4F, 'l'},    // ⵏ TIFINAGH LETTER YAN
+    {0x2D54, 'o'},    // ⵔ TIFINAGH LETTER YAR
+    {0x2D55, 'q'},    // ⵕ TIFINAGH LETTER YARR
+    {0x2D5D, 'x'},    // ⵝ TIFINAGH LETTER YATH
+    {0x3112, 't'},    // ㄒ BOPOMOFO LETTER X
+    {0x311A, 'y'},    // ㄚ BOPOMOFO LETTER A
+    {0x4E05, 't'},    // 丅 CJK IDEOGRAPH-4E05
+    {0x4E2B, 'y'},    // 丫 CJK IDEOGRAPH-4E2B
+    {0xA4D0, 'b'},    // ꓐ LISU LETTER BA
+    {0xA4D1, 'p'},    // ꓑ LISU LETTER PA
+    {0xA4D2, 'd'},    // ꓒ LISU LETTER PHA
+    {0xA4D3, 'd'},    // ꓓ LISU LETTER DA
+    {0xA4D4, 't'},    // ꓔ LISU LETTER TA
+    {0xA4D6, 'g'},    // ꓖ LISU LETTER GA
+    {0xA4D7, 'k'},    // ꓗ LISU LETTER KA
+    {0xA4D9, 'j'},    // ꓙ LISU LETTER JA
+    {0xA4DA, 'c'},    // ꓚ LISU LETTER CA
+    {0xA4DC, 'z'},    // ꓜ LISU LETTER DZA
+    {0xA4DD, 'f'},    // ꓝ LISU LETTER TSA
+    {0xA4DF, 'm'},    // ꓟ LISU LETTER MA
+    {0xA4E0, 'n'},    // ꓠ LISU LETTER NA
+    {0xA4E1, 'l'},    // ꓡ LISU LETTER LA
+    {0xA4E2, 's'},    // ꓢ LISU LETTER SA
+    {0xA4E3, 'r'},    // ꓣ LISU LETTER ZHA
+    {0xA4E6, 'v'},    // ꓦ LISU LETTER HA
+    {0xA4E7, 'h'},    // ꓧ LISU LETTER XA
+    {0xA4EA, 'w'},    // ꓪ LISU LETTER WA
+    {0xA4EB, 'x'},    // ꓫ LISU LETTER SHA
+    {0xA4EC, 'y'},    // ꓬ LISU LETTER YA
+    {0xA4EE, 'a'},    // ꓮ LISU LETTER A
+    {0xA4F0, 'e'},    // ꓰ LISU LETTER E
+    {0xA4F2, 'l'},    // ꓲ LISU LETTER I
+    {0xA4F3, 'o'},    // ꓳ LISU LETTER O
+    {0xA4F4, 'u'},    // ꓴ LISU LETTER U
+    {0xA50B, 't'},    // ꔋ VAI SYLLABLE GBEE
+    {0xA557, 'b'},    // ꕗ VAI SYLLABLE GBA
+    {0xA56F, 'l'},    // ꕯ VAI SYLLABLE NA
+    {0xA576, 's'},    // ꕶ VAI SYLLABLE POO
+    {0xA5CB, 'e'},    // ꗋ VAI SYLLABLE TO
+    {0xA647, 'i'},    // ꙇ CYRILLIC SMALL LETTER IOTA
+    {0xA6C9, 'z'},    // ꛉ BAMUM LETTER WUE
+    {0xA6DF, 'v'},    // ꛟ BAMUM LETTER KO
+    {0xA731, 's'},    // ꜱ LATIN LETTER SMALL CAPITAL S
+    {0xA781, 'l'},    // ꞁ LATIN SMALL LETTER TURNED L
+    {0xA798, 'f'},    // Ꞙ LATIN CAPITAL LETTER F WITH STROKE
+    {0xA799, 'f'},    // ꞙ LATIN SMALL LETTER F WITH STROKE
+    {0xA79F, 'u'},    // ꞟ LATIN SMALL LETTER VOLAPUK UE
+    {0xA7AE, 'i'},    // Ɪ LATIN CAPITAL LETTER SMALL CAPITAL I (confusables.txt: l)
+    {0xA7B2, 'j'},    // Ʝ LATIN CAPITAL LETTER J WITH CROSSED-TAIL
+    {0xA7B3, 'x'},    // Ꭓ LATIN CAPITAL LETTER CHI
+    {0xA7B4, 'b'},    // Ꞵ LATIN CAPITAL LETTER BETA
+    {0xA7FA, 'w'},    // ꟺ LATIN LETTER SMALL CAPITAL TURNED M
+    {0xA7FE, 'l'},    // ꟾ LATIN EPIGRAPHIC LETTER I LONGA
+    {0xAB32, 'e'},    // ꬲ LATIN SMALL LETTER BLACKLETTER E
+    {0xAB35, 'f'},    // ꬵ LATIN SMALL LETTER LENIS F
+    {0xAB3D, 'o'},    // ꬽ LATIN SMALL LETTER BLACKLETTER O
+    {0xAB47, 'r'},    // ꭇ LATIN SMALL LETTER R WITHOUT HANDLE
+    {0xAB48, 'r'},    // ꭈ LATIN SMALL LETTER DOUBLE R
+    {0xAB4E, 'u'},    // ꭎ LATIN SMALL LETTER U WITH SHORT RIGHT LEG
+    {0xAB52, 'u'},    // ꭒ LATIN SMALL LETTER U WITH LEFT HOOK
+    {0xAB5A, 'y'},    // ꭚ LATIN SMALL LETTER Y WITH SHORT RIGHT LEG
+    {0xAB64, 'a'},    // ꭤ LATIN SMALL LETTER INVERTED ALPHA
+    {0x10282, 'b'},   // 𐊂 LYCIAN LETTER B
+    {0x10286, 'e'},   // 𐊆 LYCIAN LETTER I
+    {0x10287, 'f'},   // 𐊇 LYCIAN LETTER W
+    {0x1028A, 'l'},   // 𐊊 LYCIAN LETTER J
+    {0x10290, 'x'},   // 𐊐 LYCIAN LETTER MM
+    {0x10292, 'o'},   // 𐊒 LYCIAN LETTER U
+    {0x10295, 'p'},   // 𐊕 LYCIAN LETTER R
+    {0x10296, 's'},   // 𐊖 LYCIAN LETTER S
+    {0x10297, 't'},   // 𐊗 LYCIAN LETTER T
+    {0x102A0, 'a'},   // 𐊠 CARIAN LETTER A
+    {0x102A1, 'b'},   // 𐊡 CARIAN LETTER P2
+    {0x102A2, 'c'},   // 𐊢 CARIAN LETTER D
+    {0x102A5, 'f'},   // 𐊥 CARIAN LETTER R
+    {0x102AB, 'o'},   // 𐊫 CARIAN LETTER O
+    {0x102B0, 'm'},   // 𐊰 CARIAN LETTER S
+    {0x102B1, 't'},   // 𐊱 CARIAN LETTER C-18
+    {0x102B2, 'y'},   // 𐊲 CARIAN LETTER U
+    {0x102B4, 'x'},   // 𐊴 CARIAN LETTER X
+    {0x102CF, 'h'},   // 𐋏 CARIAN LETTER E2
+    {0x10301, 'b'},   // 𐌁 OLD ITALIC LETTER BE
+    {0x10302, 'c'},   // 𐌂 OLD ITALIC LETTER KE
+    {0x10309, 'l'},   // 𐌉 OLD ITALIC LETTER I
+    {0x1030F, 'o'},   // 𐌏 OLD ITALIC LETTER O
+    {0x10311, 'm'},   // 𐌑 OLD ITALIC LETTER SHE
+    {0x10315, 't'},   // 𐌕 OLD ITALIC LETTER TE
+    {0x10317, 'x'},   // 𐌗 OLD ITALIC LETTER EKS
+    {0x1031C, 'b'},   // 𐌜 OLD ITALIC LETTER CHE
+    {0x10404, 'o'},   // 𐐄 DESERET CAPITAL LETTER LONG O
+    {0x10415, 'c'},   // 𐐕 DESERET CAPITAL LETTER CHEE
+    {0x1041B, 'l'},   // 𐐛 DESERET CAPITAL LETTER ETH
+    {0x10420, 's'},   // 𐐠 DESERET CAPITAL LETTER ZHEE
+    {0x1042C, 'o'},   // 𐐬 DESERET SMALL LETTER LONG O
+    {0x1043D, 'c'},   // 𐐽 DESERET SMALL LETTER CHEE
+    {0x10448, 's'},   // 𐑈 DESERET SMALL LETTER ZHEE
+    {0x104B4, 'r'},   // 𐒴 OSAGE CAPITAL LETTER BRA
+    {0x104C2, 'o'},   // 𐓂 OSAGE CAPITAL LETTER O
+    {0x104CE, 'u'},   // 𐓎 OSAGE CAPITAL LETTER U
+    {0x104EA, 'o'},   // 𐓪 OSAGE SMALL LETTER O
+    {0x104F6, 'u'},   // 𐓶 OSAGE SMALL LETTER U
+    {0x10507, 'z'},   // 𐔇 ELBASAN LETTER EI
+    {0x1050E, 'l'},   // 𐔎 ELBASAN LETTER JE
+    {0x10513, 'n'},   // 𐔓 ELBASAN LETTER NE
+    {0x10516, 'o'},   // 𐔖 ELBASAN LETTER O
+    {0x10518, 'k'},   // 𐔘 ELBASAN LETTER QE
+    {0x1051B, 'c'},   // 𐔛 ELBASAN LETTER SE
+    {0x1051D, 'v'},   // 𐔝 ELBASAN LETTER TE
+    {0x10525, 'f'},   // 𐔥 ELBASAN LETTER GHE
+    {0x10526, 'l'},   // 𐔦 ELBASAN LETTER GHAMMA
+    {0x10527, 'x'},   // 𐔧 ELBASAN LETTER KHE
+    {0x10926, 'l'},   // LYDIAN LETTER I
+    {0x1092C, 'o'},   // LYDIAN LETTER O
+    {0x10C13, 'x'},   // OLD TURKIC LETTER ORKHON AED
+    {0x10C17, 'o'},   // OLD TURKIC LETTER YENISEI AY
+    {0x10C1F, 'v'},   // OLD TURKIC LETTER YENISEI AL
+    {0x10C20, 'y'},   // OLD TURKIC LETTER ORKHON AEL
+    {0x10C21, 'm'},   // OLD TURKIC LETTER ORKHON ELT
+    {0x10C3E, 'l'},   // OLD TURKIC LETTER ORKHON AES
+    {0x10C82, 'x'},   // OLD HUNGARIAN CAPITAL LETTER EB
+    {0x10CA5, 'i'},   // OLD HUNGARIAN CAPITAL LETTER ESZ (confusables.txt: l)
+    {0x10CC2, 'x'},   // OLD HUNGARIAN SMALL LETTER EB
+    {0x10D07, 'o'},   // HANIFI ROHINGYA LETTER HA
+    {0x11124, 'o'},   // 𑄤 CHAKMA LETTER WAA
+    {0x11706, 'v'},   // 𑜆 AHOM LETTER PA
+    {0x1170A, 'w'},   // 𑜊 AHOM LETTER JA
+    {0x1170E, 'w'},   // 𑜎 AHOM LETTER LA
+    {0x1170F, 'w'},   // 𑜏 AHOM LETTER SA
+    {0x118A0, 'v'},   // 𑢠 WARANG CITI CAPITAL LETTER NGAA
+    {0x118A2, 'f'},   // 𑢢 WARANG CITI CAPITAL LETTER WI
+    {0x118A3, 'l'},   // 𑢣 WARANG CITI CAPITAL LETTER YU
+    {0x118A4, 'y'},   // 𑢤 WARANG CITI CAPITAL LETTER YA
+    {0x118A6, 'e'},   // 𑢦 WARANG CITI CAPITAL LETTER II
+    {0x118A9, 'z'},   // 𑢩 WARANG CITI CAPITAL LETTER O
+    {0x118AE, 'e'},   // 𑢮 WARANG CITI CAPITAL LETTER YUJ
+    {0x118B2, 'l'},   // 𑢲 WARANG CITI CAPITAL LETTER TTE
+    {0x118B5, 'o'},   // 𑢵 WARANG CITI CAPITAL LETTER AT
+    {0x118B8, 'u'},   // 𑢸 WARANG CITI CAPITAL LETTER PU
+    {0x118BC, 't'},   // 𑢼 WARANG CITI CAPITAL LETTER HAR
+    {0x118C0, 'v'},   // 𑣀 WARANG CITI SMALL LETTER NGAA
+    {0x118C1, 's'},   // 𑣁 WARANG CITI SMALL LETTER A
+    {0x118C2, 'f'},   // 𑣂 WARANG CITI SMALL LETTER WI
+    {0x118C3, 'i'},   // 𑣃 WARANG CITI SMALL LETTER YU
+    {0x118C4, 'y'},   // 𑣄 WARANG CITI SMALL LETTER YA
+    {0x118C8, 'o'},   // 𑣈 WARANG CITI SMALL LETTER E
+    {0x118D7, 'o'},   // 𑣗 WARANG CITI SMALL LETTER BU
+    {0x118D8, 'u'},   // 𑣘 WARANG CITI SMALL LETTER PU
+    {0x118DC, 'y'},   // 𑣜 WARANG CITI SMALL LETTER HAR
+    {0x11ABC, 'z'},   // 𑪼 CANADIAN SYLLABICS SPE
+    {0x11ABE, 'n'},   // 𑪾 CANADIAN SYLLABICS SPO
+    {0x11DDA, 'l'},   // 𑷚 TOLONG SIKI SIGN HECAKA
+    {0x16A19, 'r'},   // 𖨙 BAMUM LETTER PHASE-F NU
+    {0x16AD6, 's'},   // 𖫖 BASSA VAH LETTER GAH
+    {0x16AE9, 'o'},   // 𖫩 BASSA VAH LETTER OO
+    {0x16D63, 'l'},   // 𖵣 KIRAT RAI VOWEL SIGN AA
+    {0x16EAA, 'i'},   // 𖺪 BERIA ERFE CAPITAL LETTER LAKKO (confusables.txt: l)
+    {0x16EB6, 'b'},   // 𖺶 BERIA ERFE CAPITAL LETTER UI
+    {0x16F08, 'v'},   // 𖼈 MIAO LETTER VA
+    {0x16F0A, 't'},   // 𖼊 MIAO LETTER TA
+    {0x16F16, 'l'},   // 𖼖 MIAO LETTER LA
+    {0x16F28, 'l'},   // 𖼨 MIAO LETTER GHA
+    {0x16F35, 'r'},   // 𖼵 MIAO LETTER ZHA
+    {0x16F3A, 's'},   // 𖼺 MIAO LETTER SA
+    {0x16F40, 'a'},   // 𖽀 MIAO LETTER ZZYA
+    {0x16F42, 'u'},   // 𖽂 MIAO LETTER WA
+    {0x16F43, 'y'},   // 𖽃 MIAO LETTER AH
+    {0x1DF5A, 'a'},   // 𝽚 LATIN SMALL LETTER HALF A
+    {0x1DF6A, 'a'},   // 𝽪 LATIN CAPITAL LETTER PHONOTYPIC ROUNDTOP A
+    {0x1DF7D, 'w'},   // 𝽽 LATIN SMALL LETTER U WITH NOTCH AT BOTTOM
+    {0x1DF81, 'e'},   // 𝾁 LATIN CAPITAL LETTER E WITH BENT TOPBAR
+}};

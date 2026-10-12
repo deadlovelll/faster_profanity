@@ -49,7 +49,7 @@ int DiacriticsStripper::strip_uncached(char32_t code_point, char32_t* stripped) 
     // The longest canonical decomposition is 4 code points
     const utf8proc_ssize_t capacity = 4;
     utf8proc_int32_t decomposed[capacity];
-    int boundclass = UTF8PROC_BOUNDCLASS_START;
+    utf8proc_int32_t boundclass = UTF8PROC_BOUNDCLASS_START;
     utf8proc_ssize_t count = utf8proc_decompose_char(
         static_cast<utf8proc_int32_t>(code_point), decomposed, capacity, UTF8PROC_DECOMPOSE, &boundclass
     );

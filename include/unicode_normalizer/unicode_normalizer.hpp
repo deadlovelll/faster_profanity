@@ -7,8 +7,8 @@
 
 // Unambiguous per-character canonicalization done in a single pass over UTF-8 text:
 // removes invisible characters, replaces compatibility characters (fullwidth, mathematical,
-// circled, ligatures...) with ordinary ones, applies full Unicode case folding (ß -> ss)
-// and strips diacritics (é -> e).
+// circled, ligatures...) with ordinary ones, applies full Unicode case folding (ß -> ss),
+// strips diacritics (é -> e) and replaces lookalikes of Latin letters with them (Cyrillic с -> c).
 class UnicodeNormalizer {
 public:
     void normalize(std::string& text);

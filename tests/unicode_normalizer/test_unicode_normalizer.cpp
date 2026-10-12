@@ -49,13 +49,13 @@ TEST_F(UnicodeNormalizerTest, EmptyString) {
 TEST_F(UnicodeNormalizerTest, CyrillicUppercase) {
     std::string text = "БЛЯТЬ";
     normalizer.normalize(text);
-    EXPECT_EQ(text, "блять");
+    EXPECT_EQ(text, "бляtb");  // Т and Ь look like Latin T and b
 }
 
 TEST_F(UnicodeNormalizerTest, CyrillicAndLatinMixed) {
     std::string text = "ПрИвЕт WoRLd";
     normalizer.normalize(text);
-    EXPECT_EQ(text, "привет world");
+    EXPECT_EQ(text, "пpивeт world");  // пpивeт world: р and Е look like Latin p and e
 }
 
 TEST_F(UnicodeNormalizerTest, LatinDiacriticsStripped) {
@@ -67,7 +67,7 @@ TEST_F(UnicodeNormalizerTest, LatinDiacriticsStripped) {
 TEST_F(UnicodeNormalizerTest, Greek) {
     std::string text = "ΣΟΦΊΑ";
     normalizer.normalize(text);
-    EXPECT_EQ(text, "σοφια");
+    EXPECT_EQ(text, "ooφia");  // ooφia: σ, Ο, ι, Α look like Latin o, o, i, a
 }
 
 TEST_F(UnicodeNormalizerTest, TurkishDottedCapitalI) {
@@ -212,7 +212,7 @@ TEST_F(UnicodeNormalizerTest, HangulFiller) {
 }
 
 TEST_F(UnicodeNormalizerTest, CyrillicAndEmojiKept) {
-    std::string text = "сука 😀 漢字";
+    std::string text = "жизнь 😀 漢字";
     std::string expected = text;
     normalizer.normalize(text);
     EXPECT_EQ(text, expected);
@@ -239,7 +239,7 @@ TEST_F(UnicodeNormalizerTest, InvisibleCharsInsideUppercaseLatin) {
 TEST_F(UnicodeNormalizerTest, InvisibleCharsInsideUppercaseCyrillic) {
     std::string text = "\uFEFFСУ\u200BКА\u202E";
     normalizer.normalize(text);
-    EXPECT_EQ(text, "сука");
+    EXPECT_EQ(text, "cyka");  // С, У, К, А look like Latin C, y, K, A
 }
 
 TEST_F(UnicodeNormalizerTest, MathematicalBoldItalicScript) {
@@ -335,19 +335,20 @@ TEST_F(UnicodeNormalizerTest, SharpSInsideWords) {
 TEST_F(UnicodeNormalizerTest, GreekFinalSigma) {
     std::string text = "ΚΟΣΜΟΣ κόσμος";
     normalizer.normalize(text);
-    EXPECT_EQ(text, "κοσμοσ κοσμοσ");
+    // koomoo κooμoo: Σ and ς fold to σ, which looks like o. Capital Κ and Μ look like K and M, small κ and μ don't
+    EXPECT_EQ(text, "koomoo κooμoo");
 }
 
 TEST_F(UnicodeNormalizerTest, GreekCapitalWithProsgegrammeni) {
     std::string text = "ᾈ";
     normalizer.normalize(text);
-    EXPECT_EQ(text, "ἀι");
+    EXPECT_EQ(text, "ἀi");  // ἀi: ι looks like Latin i
 }
 
 TEST_F(UnicodeNormalizerTest, CherokeeFoldsToCapitals) {
     std::string text = "ꭰ Ꭰ";
     normalizer.normalize(text);
-    EXPECT_EQ(text, "Ꭰ Ꭰ");
+    EXPECT_EQ(text, "d d");  // both fold to Ꭰ, which looks like Latin D
 }
 
 TEST_F(UnicodeNormalizerTest, KelvinAndAngstromSigns) {
@@ -371,13 +372,14 @@ TEST_F(UnicodeNormalizerTest, MultipleMarksOnOneLetter) {
 TEST_F(UnicodeNormalizerTest, CyrillicYoBecomesYe) {
     std::string text = "ЁБАНЫЙ ёб";
     normalizer.normalize(text);
-    EXPECT_EQ(text, "ебаный еб");
+    EXPECT_EQ(text, "eбahый eб");  // eбahый eб: е, А, Н look like Latin e, A, H
 }
 
 TEST_F(UnicodeNormalizerTest, CyrillicLettersWithMarkKept) {
     std::string text = "хуй ХУЙ ў Ў ї Ї";
     normalizer.normalize(text);
-    EXPECT_EQ(text, "хуй хуй ў ў ї ї");
+    // xyй xyй ў ў ї ї: х and у look like Latin x and y, й, ў, ї keep their marks
+    EXPECT_EQ(text, "xyй xyй ў ў ї ї");
 }
 
 TEST_F(UnicodeNormalizerTest, StrikethroughAndUnderline) {
@@ -413,5 +415,41 @@ TEST_F(UnicodeNormalizerTest, HangulUnchanged) {
 TEST_F(UnicodeNormalizerTest, ChurchSlavonicCombiningMarks) {
     std::string text = "сⷠу꙰к꙼аꚞ";
     normalizer.normalize(text);
-    EXPECT_EQ(text, "сука");
+    EXPECT_EQ(text, "cyкa");  // cyкa: с, у, а look like Latin c, y, a
+}
+
+TEST_F(UnicodeNormalizerTest, CyrillicLookalikeInLatinWord) {
+    std::string text = "fuсk";  // Cyrillic с
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "fuck");
+}
+
+TEST_F(UnicodeNormalizerTest, UppercaseCyrillicLookalikes) {
+    std::string text = "ВІТСН";  // ВІТСН, all Cyrillic
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "bitch");
+}
+
+TEST_F(UnicodeNormalizerTest, GreekLookalikes) {
+    std::string text = "ΤΙΤ";  // ΤΙΤ, all Greek
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "tit");
+}
+
+TEST_F(UnicodeNormalizerTest, LookalikeWithDiacritic) {
+    std::string text = "fùсk";  // ù and Cyrillic с
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "fuck");
+}
+
+TEST_F(UnicodeNormalizerTest, LookalikeAfterCaseFolding) {
+    std::string text = "ꭰ";  // Cherokee small letter a folds to Ꭰ, which looks like D
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "d");
+}
+
+TEST_F(UnicodeNormalizerTest, CyrillicWordWithoutLookalikesUnchanged) {
+    std::string text = "жизнь";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "жизнь");
 }

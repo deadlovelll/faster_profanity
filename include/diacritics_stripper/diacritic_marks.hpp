@@ -8,7 +8,7 @@ struct CodePointRange {
 };
 
 // Diacritics shared by Latin, Greek and Cyrillic.
-// Blocks from https://www.unicode.org/Public/17.0.0/ucd/Blocks.txt, comments quote their lines
+// Blocks from https://www.unicode.org/Public/18.0.0/ucd/Blocks.txt, comments quote their lines
 inline constexpr std::array<CodePointRange, 10> diacritic_marks = {{
     {0x0300, 0x036F},  // 0300..036F; Combining Diacritical Marks
     {0x0483, 0x0489},  // 0400..04FF; Cyrillic - only its combining marks: titlo, pokrytie, millions sign
