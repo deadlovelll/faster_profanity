@@ -28,28 +28,24 @@ void UnicodeNormalizer::normalize(std::string& text) {
         }
 
         char32_t current = static_cast<char32_t>(code_point);
-        CharKind kind = char_classifier.classify(current);
-        if (kind == CharKind::Invisible) {
-            pos += len;
-            continue;
-        }
-
-        if (kind == CharKind::Compatibility) {
-            append_compatibility_form(out, current);
-            pos += len;
-            continue;
-        }
-
-        if (kind == CharKind::CaseFolding) {
-            append_case_folded(out, current);
-            pos += len;
-            continue;
-        }
-
-        if (kind == CharKind::Diacritic) {
-            append_without_diacritics(out, current);
-            pos += len;
-            continue;
+        switch (char_classifier.classify(current)) {
+            case CharKind::Invisible:
+                pos += len;
+                continue;
+            case CharKind::Compatibility:
+                append_compatibility_form(out, current);
+                pos += len;
+                continue;
+            case CharKind::CaseFolding:
+                append_case_folded(out, current);
+                pos += len;
+                continue;
+            case CharKind::Diacritic:
+                append_without_diacritics(out, current);
+                pos += len;
+                continue;
+            case CharKind::Regular:
+                break;
         }
 
         // Checked before lowering: some letters look Latin only in uppercase, Cyrillic В -> b
