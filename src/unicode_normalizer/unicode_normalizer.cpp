@@ -39,6 +39,12 @@ void UnicodeNormalizer::normalize(std::string& text) {
             continue;
         }
 
+        if (kind == CharKind::CaseFolding) {
+            append_case_folded(out, current);
+            pos += len;
+            continue;
+        }
+
         char32_t lowered = lower(current);
         if (lowered == current) {
             out.append(text, static_cast<std::size_t>(pos), static_cast<std::size_t>(len));
@@ -58,6 +64,10 @@ UnicodeNormalizer::CharKind UnicodeNormalizer::classify(char32_t code_point) {
     }
     if (property->decomp_type != 0) {
         return CharKind::Compatibility;
+    }
+    // Fold differs from lowercase: ß -> ss
+    if (property->casefold_seqindex != property->lowercase_seqindex) {
+        return CharKind::CaseFolding;
     }
     return CharKind::Regular;
 }
@@ -94,6 +104,29 @@ void UnicodeNormalizer::append_compatibility_form(std::string& out, char32_t cod
 
     for (utf8proc_ssize_t i = 0; i < count; ++i) {
         append_code_point(out, lower(static_cast<char32_t>(decomposed[i])));
+    }
+}
+
+void UnicodeNormalizer::append_case_folded(std::string& out, char32_t code_point) {
+    // The longest full case folding is 3 code points (ΐ)
+    const utf8proc_ssize_t capacity = 4;
+    utf8proc_int32_t folded[capacity];
+    int boundclass = UTF8PROC_BOUNDCLASS_START;
+    utf8proc_ssize_t count = utf8proc_decompose_char(
+        static_cast<utf8proc_int32_t>(lower(code_point)), folded, capacity, UTF8PROC_CASEFOLD, &boundclass
+    );
+    if (count > 1 && count <= capacity) {
+        count = utf8proc_normalize_utf32(
+            folded, count, static_cast<utf8proc_option_t>(UTF8PROC_STABLE | UTF8PROC_COMPOSE)
+        );
+    }
+    if (count <= 0 || count > capacity) {
+        append_code_point(out, lower(code_point));
+        return;
+    }
+
+    for (utf8proc_ssize_t i = 0; i < count; ++i) {
+        append_code_point(out, static_cast<char32_t>(folded[i]));
     }
 }
 

@@ -319,3 +319,39 @@ TEST_F(UnicodeNormalizerTest, TitlecaseDigraphKeepsComposedCaron) {
     normalizer.normalize(text);
     EXPECT_EQ(text, "d\u017E");
 }
+
+TEST_F(UnicodeNormalizerTest, SharpS) {
+    std::string text = "ß ẞ";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "ss ss");
+}
+
+TEST_F(UnicodeNormalizerTest, SharpSInsideWords) {
+    std::string text = "STRAẞE Straße";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "strasse strasse");
+}
+
+TEST_F(UnicodeNormalizerTest, GreekFinalSigma) {
+    std::string text = "ΚΟΣΜΟΣ κόσμος";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "κοσμοσ κόσμοσ");
+}
+
+TEST_F(UnicodeNormalizerTest, GreekCapitalWithProsgegrammeni) {
+    std::string text = "ᾈ";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "ἀι");
+}
+
+TEST_F(UnicodeNormalizerTest, CherokeeFoldsToCapitals) {
+    std::string text = "ꭰ Ꭰ";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "Ꭰ Ꭰ");
+}
+
+TEST_F(UnicodeNormalizerTest, KelvinAndAngstromSigns) {
+    std::string text = "K Å";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "k å");
+}
