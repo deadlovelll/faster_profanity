@@ -314,10 +314,10 @@ TEST_F(UnicodeNormalizerTest, CompatibilityLettersWithInvisibleChars) {
     EXPECT_EQ(text, "shit");
 }
 
-TEST_F(UnicodeNormalizerTest, TitlecaseDigraphKeepsComposedCaron) {
+TEST_F(UnicodeNormalizerTest, TitlecaseDigraphLosesCaron) {
     std::string text = "ǅ";
     normalizer.normalize(text);
-    EXPECT_EQ(text, "d\u017E");
+    EXPECT_EQ(text, "dz");
 }
 
 TEST_F(UnicodeNormalizerTest, SharpS) {
@@ -342,7 +342,7 @@ TEST_F(UnicodeNormalizerTest, GreekFinalSigma) {
 TEST_F(UnicodeNormalizerTest, GreekCapitalWithProsgegrammeni) {
     std::string text = "ᾈ";
     normalizer.normalize(text);
-    EXPECT_EQ(text, "ἀi");  // ἀi: ι looks like Latin i
+    EXPECT_EQ(text, "a");
 }
 
 TEST_F(UnicodeNormalizerTest, CherokeeFoldsToCapitals) {
@@ -495,4 +495,16 @@ TEST_F(UnicodeNormalizerTest, FlagsKept) {
     std::string expected = text;
     normalizer.normalize(text);
     EXPECT_EQ(text, expected);
+}
+
+TEST_F(UnicodeNormalizerTest, SpacingAccentsInsideWord) {
+    std::string text = "f\u00B4uck fu\u02DCck";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "fuck fuck");
+}
+
+TEST_F(UnicodeNormalizerTest, CaseFoldingLosesDiacritics) {
+    std::string text = "\u01F0erk \u1E97wat \u0390";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "jerk twat i");
 }

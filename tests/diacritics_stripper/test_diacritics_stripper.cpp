@@ -54,11 +54,23 @@ TEST_F(DiacriticsStripperTest, CharacterOutsideTable) {
 }
 
 TEST_F(DiacriticsStripperTest, DiacriticMarkRangeBoundaries) {
-    EXPECT_FALSE(DiacriticsStripper::is_diacritic_mark(U'˿'));
-    EXPECT_TRUE(DiacriticsStripper::is_diacritic_mark(U'̀'));
-    EXPECT_TRUE(DiacriticsStripper::is_diacritic_mark(U'ͯ'));
-    EXPECT_FALSE(DiacriticsStripper::is_diacritic_mark(U'Ͱ'));
-    EXPECT_TRUE(DiacriticsStripper::is_diacritic_mark(U'︯'));
-    EXPECT_FALSE(DiacriticsStripper::is_diacritic_mark(U'︰'));
-    EXPECT_FALSE(DiacriticsStripper::is_diacritic_mark(U'़'));  // Devanagari nukta
+    EXPECT_FALSE(stripper.is_diacritic_mark(U'˿'));
+    EXPECT_TRUE(stripper.is_diacritic_mark(U'̀'));
+    EXPECT_TRUE(stripper.is_diacritic_mark(U'ͯ'));
+    EXPECT_FALSE(stripper.is_diacritic_mark(U'Ͱ'));
+    EXPECT_TRUE(stripper.is_diacritic_mark(U'︯'));
+    EXPECT_FALSE(stripper.is_diacritic_mark(U'︰'));
+    EXPECT_FALSE(stripper.is_diacritic_mark(U'़'));  // Devanagari nukta
+}
+
+TEST_F(DiacriticsStripperTest, CompatibilityLetterWithDiacritic) {
+    char32_t stripped[4];
+    ASSERT_EQ(stripper.strip(U'ǆ', stripped), 2);
+    EXPECT_EQ(stripped[0], U'd');
+    EXPECT_EQ(stripped[1], U'z');
+}
+
+TEST_F(DiacriticsStripperTest, SpacingAccentRemoved) {
+    char32_t stripped[4];
+    EXPECT_EQ(stripper.strip(U'´', stripped), 0);
 }

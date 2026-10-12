@@ -17,7 +17,7 @@ private:
     CharClassifier char_classifier;
     DiacriticsStripper diacritics_stripper;
 
-    void append_compatibility_form(std::string& out, char32_t code_point);
+    bool append_compatibility_form(std::string& out, char32_t code_point);
     void append_case_folded(std::string& out, char32_t code_point);
     void append_without_diacritics(std::string& out, char32_t code_point);
     void append_code_point(std::string& out, char32_t code_point);

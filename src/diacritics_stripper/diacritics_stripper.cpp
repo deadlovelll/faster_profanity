@@ -5,7 +5,7 @@
 #include <utf8proc.h>
 
 // Letters below U+2000 (Latin, Greek, Cyrillic) are stripped once, at program start: one lookup per letter
-const DiacriticsStripper::Table DiacriticsStripper::table = build_table();
+const DiacriticsStripper::Table DiacriticsStripper::table = DiacriticsStripper().build_table();
 
 int DiacriticsStripper::strip(char32_t code_point, char32_t* stripped) {
     if (code_point < table.size() && table[code_point] != 0) {
@@ -51,7 +51,8 @@ int DiacriticsStripper::strip_uncached(char32_t code_point, char32_t* stripped) 
     utf8proc_int32_t decomposed[capacity];
     utf8proc_int32_t boundclass = UTF8PROC_BOUNDCLASS_START;
     utf8proc_ssize_t count = utf8proc_decompose_char(
-        static_cast<utf8proc_int32_t>(code_point), decomposed, capacity, UTF8PROC_DECOMPOSE, &boundclass
+        static_cast<utf8proc_int32_t>(code_point), decomposed, capacity,
+        static_cast<utf8proc_option_t>(UTF8PROC_DECOMPOSE | UTF8PROC_COMPAT), &boundclass
     );
     bool has_diacritics = false;
     for (utf8proc_ssize_t i = 0; count <= capacity && i < count; ++i) {
@@ -64,7 +65,7 @@ int DiacriticsStripper::strip_uncached(char32_t code_point, char32_t* stripped) 
 
     int written = 0;
     for (utf8proc_ssize_t i = 0; i < count; ++i) {
-        if (!is_diacritic_mark(static_cast<char32_t>(decomposed[i]))) {
+        if (!is_diacritic_mark(static_cast<char32_t>(decomposed[i])) && decomposed[i] != ' ') {
             stripped[written++] = static_cast<char32_t>(utf8proc_tolower(decomposed[i]));
         }
     }

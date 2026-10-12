@@ -1,5 +1,4 @@
 #include "char_classifier/char_classifier.hpp"
-#include "diacritics_stripper/diacritics_stripper.hpp"
 
 #include <utf8proc.h>
 
@@ -32,17 +31,17 @@ CharKind CharClassifier::classify_special(char32_t code_point, const utf8proc_pr
     if (property->decomp_type != 0) {
         return CharKind::Compatibility;
     }
-    // fold differs from lowercase: ß -> ss
-    if (property->casefold_seqindex != property->lowercase_seqindex) {
-        return CharKind::CaseFolding;
-    }
     if (
         // accented letter: é -> e + U+0301
         property->decomp_seqindex != UINT16_MAX
         // standalone accent: Zalgo, f + U+0336
-        || DiacriticsStripper::is_diacritic_mark(code_point))
+        || diacritics_stripper.is_diacritic_mark(code_point))
     {
         return CharKind::Diacritic;
+    }
+    // fold differs from lowercase: ß -> ss
+    if (property->casefold_seqindex != property->lowercase_seqindex) {
+        return CharKind::CaseFolding;
     }
     return CharKind::Regular;
 }

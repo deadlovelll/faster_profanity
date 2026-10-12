@@ -32,14 +32,16 @@ void UnicodeNormalizer::normalize(std::string& text) {
             case CharKind::Invisible:
                 pos += len;
                 continue;
-            case CharKind::Compatibility:
-                append_compatibility_form(out, current);
-                pos += len;
-                continue;
             case CharKind::CaseFolding:
                 append_case_folded(out, current);
                 pos += len;
                 continue;
+            case CharKind::Compatibility:
+                if (append_compatibility_form(out, current)) {
+                    pos += len;
+                    continue;
+                }
+                [[fallthrough]];
             case CharKind::Diacritic:
                 append_without_diacritics(out, current);
                 pos += len;
@@ -77,7 +79,7 @@ void UnicodeNormalizer::normalize(std::string& text) {
     text.swap(out);
 }
 
-void UnicodeNormalizer::append_compatibility_form(std::string& out, char32_t code_point) {
+bool UnicodeNormalizer::append_compatibility_form(std::string& out, char32_t code_point) {
     // The longest compatibility decomposition is 18 code points (U+FDFA).
     // 32 leaves headroom for future.
     // See https://stackoverflow.com/questions/61779904
@@ -88,6 +90,11 @@ void UnicodeNormalizer::append_compatibility_form(std::string& out, char32_t cod
         static_cast<utf8proc_int32_t>(code_point), decomposed, capacity,
         static_cast<utf8proc_option_t>(UTF8PROC_DECOMPOSE | UTF8PROC_COMPAT), &boundclass
     );
+    for (utf8proc_ssize_t i = 0; count <= capacity && i < count; ++i) {
+        if (diacritics_stripper.is_diacritic_mark(static_cast<char32_t>(decomposed[i]))) {
+            return false;
+        }
+    }
     if (count > 0 && count <= capacity) {
         count = utf8proc_normalize_utf32(
             decomposed, count, static_cast<utf8proc_option_t>(UTF8PROC_STABLE | UTF8PROC_COMPOSE)
@@ -95,7 +102,7 @@ void UnicodeNormalizer::append_compatibility_form(std::string& out, char32_t cod
     }
     if (count <= 0 || count > capacity) {
         append_code_point(out, lower(code_point));
-        return;
+        return true;
     }
 
     // There can be cases that leave the parentheses:
@@ -110,6 +117,7 @@ void UnicodeNormalizer::append_compatibility_form(std::string& out, char32_t cod
     for (utf8proc_ssize_t i = 0; i < count; ++i) {
         append_code_point(out, lower(static_cast<char32_t>(decomposed[i])));
     }
+    return true;
 }
 
 void UnicodeNormalizer::append_case_folded(std::string& out, char32_t code_point) {
