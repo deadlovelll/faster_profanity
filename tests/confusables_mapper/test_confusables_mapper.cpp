@@ -31,6 +31,17 @@ TEST(ConfusablesMapperTest, NoLookalike) {
     EXPECT_EQ(ConfusablesMapper::to_latin(U'😀'), 0);
 }
 
+TEST(ConfusablesMapperTest, SmallCapitals) {
+    EXPECT_EQ(ConfusablesMapper::to_latin(U'ꜰ'), 'f');
+    EXPECT_EQ(ConfusablesMapper::to_latin(U'ᴋ'), 'k');
+    EXPECT_EQ(ConfusablesMapper::to_latin(U'ʙ'), 'b');
+}
+
+TEST(ConfusablesMapperTest, NegativeCircledAndSquaredLetters) {
+    EXPECT_EQ(ConfusablesMapper::to_latin(U'🅕'), 'f');
+    EXPECT_EQ(ConfusablesMapper::to_latin(U'🅵'), 'f');
+}
+
 TEST(ConfusablesMapperTest, BeyondBasicMultilingualPlane) {
     EXPECT_EQ(ConfusablesMapper::to_latin(U'\U0001042C'), 'o');  // Deseret small long o
     EXPECT_EQ(ConfusablesMapper::to_latin(U'\U000118C0'), 'v');  // Warang Citi small ngaa

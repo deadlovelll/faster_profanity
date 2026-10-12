@@ -60,6 +60,16 @@ void UnicodeNormalizer::normalize(std::string& text) {
             continue;
         }
 
+        if (is_regional_indicator(current)) [[unlikely]] {
+            if (is_regional_indicator_at(text, pos - 4) || is_regional_indicator_at(text, pos + len)) {
+                out.append(text, static_cast<std::size_t>(pos), static_cast<std::size_t>(len));
+            } else {
+                out.push_back(static_cast<char>('a' + (current - U'\U0001F1E6')));
+            }
+            pos += len;
+            continue;
+        }
+
         char32_t lowered = lower(current);
         if (lowered == current) {
             out.append(text, static_cast<std::size_t>(pos), static_cast<std::size_t>(len));
@@ -150,6 +160,19 @@ void UnicodeNormalizer::append_code_point(std::string& out, char32_t code_point)
     utf8proc_uint8_t encoded[4];
     utf8proc_ssize_t encoded_len = utf8proc_encode_char(static_cast<utf8proc_int32_t>(code_point), encoded);
     out.append(reinterpret_cast<const char*>(encoded), static_cast<std::size_t>(encoded_len));
+}
+
+bool UnicodeNormalizer::is_regional_indicator(char32_t code_point) {
+    return code_point >= U'\U0001F1E6' && code_point <= U'\U0001F1FF';
+}
+
+bool UnicodeNormalizer::is_regional_indicator_at(const std::string& text, std::ptrdiff_t pos) {
+    if (pos < 0 || pos + 4 > static_cast<std::ptrdiff_t>(text.size())) {
+        return false;
+    }
+    utf8proc_int32_t code_point;
+    utf8proc_ssize_t len = utf8proc_iterate(reinterpret_cast<const utf8proc_uint8_t*>(text.data()) + pos, 4, &code_point);
+    return len == 4 && is_regional_indicator(static_cast<char32_t>(code_point));
 }
 
 char32_t UnicodeNormalizer::lower(char32_t code_point) {

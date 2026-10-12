@@ -453,3 +453,46 @@ TEST_F(UnicodeNormalizerTest, CyrillicWordWithoutLookalikesUnchanged) {
     normalizer.normalize(text);
     EXPECT_EQ(text, "жизнь");
 }
+
+TEST_F(UnicodeNormalizerTest, SmallCapitals) {
+    std::string text = "ꜰᴜᴄᴋ";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "fuck");
+}
+
+TEST_F(UnicodeNormalizerTest, NegativeCircledLetters) {
+    std::string text = "🅕🅤🅒🅚";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "fuck");
+}
+
+TEST_F(UnicodeNormalizerTest, NegativeSquaredLetters) {
+    std::string text = "🅵🆄🅲🅺";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "fuck");
+}
+
+TEST_F(UnicodeNormalizerTest, RegionalIndicatorsSeparatedByInvisibleChars) {
+    std::string text = "\U0001F1EB​\U0001F1FA​\U0001F1E8​\U0001F1F0";  // 🇫 🇺 🇨 🇰 split by ZWSP
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "fuck");
+}
+
+TEST_F(UnicodeNormalizerTest, RegionalIndicatorsSeparatedBySpaces) {
+    std::string text = "\U0001F1EB \U0001F1FA \U0001F1E8 \U0001F1F0";  // 🇫 🇺 🇨 🇰
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "f u c k");
+}
+
+TEST_F(UnicodeNormalizerTest, RegionalIndicatorNextToLetters) {
+    std::string text = "\U0001F1EBuck";  // 🇫uck
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "fuck");
+}
+
+TEST_F(UnicodeNormalizerTest, FlagsKept) {
+    std::string text = "\U0001F1FA\U0001F1F8 \U0001F1E6\U0001F1F7\U0001F1F8\U0001F1EA";  // 🇺🇸 🇦🇷🇸🇪, letters would spell arse
+    std::string expected = text;
+    normalizer.normalize(text);
+    EXPECT_EQ(text, expected);
+}

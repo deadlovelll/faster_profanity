@@ -10,6 +10,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# LTO: lets the compiler inline functions across .cpp files, including utf8proc
+include(CheckIPOSupported)
+check_ipo_supported(RESULT ipo_supported)
+if(ipo_supported)
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
+endif()
+
 file(COPY ${CMAKE_SOURCE_DIR}/src/data DESTINATION ${CMAKE_BINARY_DIR}/)
 
 add_library(faster_profanity_lib
@@ -20,6 +27,9 @@ add_library(faster_profanity_lib
     src/utf8_sizer/utf8_sizer.cpp
     src/text_normalizer/text_normalizer.cpp
     src/unicode_normalizer/unicode_normalizer.cpp
+    src/diacritics_stripper/diacritics_stripper.cpp
+    src/char_classifier/char_classifier.cpp
+    src/confusables_mapper/confusables_mapper.cpp
 )
 
 target_include_directories(faster_profanity_lib
@@ -56,7 +66,7 @@ FetchContent_Declare(
 FetchContent_Declare(
     utf8proc
     GIT_REPOSITORY https://github.com/JuliaStrings/utf8proc.git
-    GIT_TAG        v2.11.3
+    GIT_TAG        v2.12.0
 )
 
 FetchContent_MakeAvailable(pybind11)
