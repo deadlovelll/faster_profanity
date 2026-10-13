@@ -24,6 +24,24 @@ bool DiacriticsStripper::is_diacritic_mark(char32_t code_point) {
     return false;
 }
 
+char32_t DiacriticsStripper::compose_separate_letter(char32_t letter, char32_t mark) {
+    for (const SeparateLetter& separate_letter : separate_letters) {
+        if (separate_letter.base == letter && separate_letter.mark == mark) {
+            return separate_letter.letter;
+        }
+    }
+    return 0;
+}
+
+bool DiacriticsStripper::is_separate_letter_base(char32_t code_point) {
+    for (const SeparateLetter& separate_letter : separate_letters) {
+        if (separate_letter.base == code_point) {
+            return true;
+        }
+    }
+    return false;
+}
+
 // Stripped form of every character that strips to exactly one code point, 0 for the rest
 DiacriticsStripper::Table DiacriticsStripper::build_table() {
     Table built{};
@@ -73,8 +91,8 @@ int DiacriticsStripper::strip_uncached(char32_t code_point, char32_t* stripped) 
 }
 
 bool DiacriticsStripper::is_separate_letter(char32_t code_point) {
-    for (char32_t letter : separate_letters) {
-        if (code_point == letter) {
+    for (const SeparateLetter& separate_letter : separate_letters) {
+        if (separate_letter.letter == code_point) {
             return true;
         }
     }

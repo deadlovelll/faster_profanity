@@ -382,6 +382,12 @@ TEST_F(UnicodeNormalizerTest, CyrillicLettersWithMarkKept) {
     EXPECT_EQ(text, "xyй xyй ў ў ї ї");
 }
 
+TEST_F(UnicodeNormalizerTest, DecomposedCyrillicLettersWithMarkKept) {
+    std::string text = "хуи\u0306 ХУИ\u0306 у\u0306 У\u0306 і\u0308 І\u0308";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "xyй xyй ў ў ї ї");
+}
+
 TEST_F(UnicodeNormalizerTest, StrikethroughAndUnderline) {
     std::string text = "f\u0336u\u0336c\u0336k\u0336 s\u0332h\u0332i\u0332t\u0332";
     normalizer.normalize(text);

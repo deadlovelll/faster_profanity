@@ -35,6 +35,13 @@ TEST_F(DiacriticsStripperTest, LettersWithSeparateMarkKept) {
     EXPECT_EQ(stripped[0], U'ї');
 }
 
+TEST_F(DiacriticsStripperTest, SeparateLetterComposedFromMark) {
+    EXPECT_EQ(stripper.compose_separate_letter(U'и', U'\u0306'), U'й');
+    EXPECT_EQ(stripper.compose_separate_letter(U'У', U'\u0306'), U'Ў');
+    EXPECT_EQ(stripper.compose_separate_letter(U'і', U'\u0308'), U'ї');
+    EXPECT_EQ(stripper.compose_separate_letter(U'е', U'\u0308'), U'\0');
+}
+
 TEST_F(DiacriticsStripperTest, StandaloneMarkRemoved) {
     char32_t stripped[4];
     EXPECT_EQ(stripper.strip(U'́', stripped), 0);

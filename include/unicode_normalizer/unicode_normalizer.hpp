@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 #include <string>
 
 #include "char_classifier/char_classifier.hpp"
@@ -17,6 +18,10 @@ private:
     CharClassifier char_classifier;
     DiacriticsStripper diacritics_stripper;
 
+    void recompose_separate_letter(
+        const std::uint8_t* bytes, std::ptrdiff_t size, std::ptrdiff_t pos, std::ptrdiff_t& len,
+        char32_t& code_point, CharKind& kind
+    );
     bool append_compatibility_form(std::string& out, char32_t code_point);
     void append_case_folded(std::string& out, char32_t code_point);
     void append_without_diacritics(std::string& out, char32_t code_point);

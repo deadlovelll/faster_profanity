@@ -28,7 +28,9 @@ void UnicodeNormalizer::normalize(std::string& text) {
         }
 
         char32_t current = static_cast<char32_t>(code_point);
-        switch (char_classifier.classify(current)) {
+        CharKind kind = char_classifier.classify(current);
+        recompose_separate_letter(bytes, size, pos, len, current, kind);
+        switch (kind) {
             case CharKind::Invisible:
                 pos += len;
                 continue;
@@ -77,6 +79,25 @@ void UnicodeNormalizer::normalize(std::string& text) {
         pos += len;
     }
     text.swap(out);
+}
+
+void UnicodeNormalizer::recompose_separate_letter(
+    const std::uint8_t* bytes, std::ptrdiff_t size, std::ptrdiff_t pos, std::ptrdiff_t& len,
+    char32_t& code_point, CharKind& kind
+) {
+    if (
+        kind == CharKind::Regular && pos + len < size && bytes[pos + len] == 0xCC
+        && diacritics_stripper.is_separate_letter_base(code_point)) [[unlikely]]
+    {
+        utf8proc_int32_t mark;
+        utf8proc_ssize_t mark_len = utf8proc_iterate(bytes + pos + len, size - pos - len, &mark);
+        char32_t separate_letter = diacritics_stripper.compose_separate_letter(code_point, static_cast<char32_t>(mark));
+        if (separate_letter != 0) {
+            code_point = separate_letter;
+            len += mark_len;
+            kind = CharKind::Diacritic;
+        }
+    }
 }
 
 bool UnicodeNormalizer::append_compatibility_form(std::string& out, char32_t code_point) {
