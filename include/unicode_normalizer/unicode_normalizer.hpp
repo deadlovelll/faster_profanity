@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <vector>
 
 #include "char_classifier/char_classifier.hpp"
 #include "diacritics_stripper/diacritics_stripper.hpp"
@@ -14,9 +15,13 @@
 class UnicodeNormalizer {
 public:
     void normalize(std::string& text);
+    void normalize(std::string& text, std::vector<std::size_t>& source_offsets);
 private:
     CharClassifier char_classifier;
     DiacriticsStripper diacritics_stripper;
+
+    template <bool with_offsets>
+    void normalize_text(std::string& text, std::vector<std::size_t>* source_offsets);
 
     void recompose_separate_letter(
         const std::uint8_t* bytes, std::ptrdiff_t size, std::ptrdiff_t pos, std::ptrdiff_t& len,

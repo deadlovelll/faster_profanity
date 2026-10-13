@@ -8,9 +8,11 @@ TEST(ConfusablesMapperTest, CyrillicLookalikes) {
     EXPECT_EQ(ConfusablesMapper::to_latin(U'Р'), 'p');
 }
 
-TEST(ConfusablesMapperTest, LookalikeOnlyInUppercase) {
+TEST(ConfusablesMapperTest, LowercaseTakesLookalikeOfUppercase) {
     EXPECT_EQ(ConfusablesMapper::to_latin(U'В'), 'b');
-    EXPECT_EQ(ConfusablesMapper::to_latin(U'в'), 0);
+    EXPECT_EQ(ConfusablesMapper::to_latin(U'в'), 'b');
+    EXPECT_EQ(ConfusablesMapper::to_latin(U'к'), 'k');
+    EXPECT_EQ(ConfusablesMapper::to_latin(U'ν'), 'v');
 }
 
 TEST(ConfusablesMapperTest, UppercaseLookalikesOfIAreI) {

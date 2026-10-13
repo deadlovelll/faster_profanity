@@ -3,6 +3,8 @@
 
 #include <algorithm>
 
+#include <utf8proc.h>
+
 // Lookalikes below U+10000 are put in a table once, at program start: one lookup per letter
 const ConfusablesMapper::Table ConfusablesMapper::table = build_table();
 
@@ -26,6 +28,12 @@ ConfusablesMapper::Table ConfusablesMapper::build_table() {
     for (const Confusable& confusable : confusables) {
         if (confusable.code_point < built.size()) {
             built[confusable.code_point] = confusable.latin;
+        }
+    }
+    for (const Confusable& confusable : confusables) {
+        char32_t lowered = static_cast<char32_t>(utf8proc_tolower(static_cast<utf8proc_int32_t>(confusable.code_point)));
+        if (lowered < built.size() && built[lowered] == 0) {
+            built[lowered] = confusable.latin;
         }
     }
     return built;

@@ -4,14 +4,34 @@
 #include <utf8proc.h>
 
 void UnicodeNormalizer::normalize(std::string& text) {
+    normalize_text<false>(text, nullptr);
+}
+
+void UnicodeNormalizer::normalize(std::string& text, std::vector<std::size_t>& source_offsets) {
+    normalize_text<true>(text, &source_offsets);
+}
+
+template <bool with_offsets>
+void UnicodeNormalizer::normalize_text(std::string& text, std::vector<std::size_t>* source_offsets) {
     std::string out;
     out.reserve(text.size());
 
     const utf8proc_uint8_t* bytes = reinterpret_cast<const utf8proc_uint8_t*>(text.data());
     const utf8proc_ssize_t size = static_cast<utf8proc_ssize_t>(text.size());
     utf8proc_ssize_t pos = 0;
+    utf8proc_ssize_t unit_start = 0;
+    if constexpr (with_offsets) {
+        source_offsets->clear();
+        source_offsets->reserve(text.size() + 1);
+    }
 
     while (pos < size) {
+        if constexpr (with_offsets) {
+            while (source_offsets->size() < out.size()) {
+                source_offsets->push_back(static_cast<std::size_t>(unit_start));
+            }
+            unit_start = pos;
+        }
         // ASCII fast path: no ASCII character is invisible
         if (bytes[pos] < 0x80) {
             out.push_back(lower_ascii(static_cast<char>(bytes[pos])));
@@ -81,6 +101,10 @@ void UnicodeNormalizer::normalize(std::string& text) {
             append_code_point(out, lowered);
         }
         pos += len;
+    }
+    if constexpr (with_offsets) {
+        source_offsets->resize(out.size(), static_cast<std::size_t>(unit_start));
+        source_offsets->push_back(text.size());
     }
     text.swap(out);
 }

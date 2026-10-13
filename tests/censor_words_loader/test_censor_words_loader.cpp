@@ -17,6 +17,6 @@ TEST_F(CensorWordsLoaderTest, WordsNormalizedLikeInput) {
     std::ofstream(path) << "Сука\npédé\nFUCK\narse-licking\n";
     loader.load_censor_words("", path.string());
     std::filesystem::remove(path);
-    std::unordered_set<std::string> expected = {"cyкa", "pede", "fuck", "arse licking"};
+    std::unordered_set<std::string> expected = {"cyka", "pede", "fuck", "arse licking"};
     EXPECT_EQ(loader.get_censor_words(), expected);
 }

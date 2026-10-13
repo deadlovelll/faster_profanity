@@ -9,6 +9,7 @@
 #include "swear_word_hider/swear_word_hider.hpp"
 #include "tokenizer/tokenizer.hpp"
 #include "unicode_normalizer/unicode_normalizer.hpp"
+#include "utf8_sizer/utf8_sizer.hpp"
 
 class ProfaneDetector {
 public:
@@ -26,6 +27,7 @@ private:
     CensorWordsLoader censor_words_loader;
     UnicodeNormalizer unicode_normalizer;
     Tokenizer tokenizer;
+    UTF8Sizer utf8_sizer;
 
     std::vector<Token> find_profane_tokens(const std::string& normalized_text);
 };

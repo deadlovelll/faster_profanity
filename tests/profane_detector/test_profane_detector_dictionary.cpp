@@ -16,8 +16,10 @@ static ProfaneDetector make_detector(const std::string& words) {
 
 TEST(ProfaneDetectorDictionaryTest, NonAsciiDictionaryWordFound) {
     ProfaneDetector detector = make_detector("сука\n");
-    std::string censored = detector.censor("Сука", '*');
-    EXPECT_EQ(censored.find_first_not_of('*'), std::string::npos) << censored;
+    for (const std::string& text : {"Сука", "СУКА", "сука"}) {
+        std::string censored = detector.censor(text, '*');
+        EXPECT_EQ(censored.find_first_not_of('*'), std::string::npos) << text << " -> " << censored;
+    }
 }
 
 TEST(ProfaneDetectorDictionaryTest, SpacedLettersFound) {
@@ -45,6 +47,16 @@ TEST(ProfaneDetectorDictionaryTest, HyphenatedDictionaryEntryFound) {
     ProfaneDetector detector = make_detector("arse-licking\n");
     EXPECT_EQ(detector.censor("arse licking", '*'), "**** *******");
     EXPECT_EQ(detector.censor("arse-licking", '*'), "****-*******");
+}
+
+TEST(ProfaneDetectorDictionaryTest, CensorKeepsOriginalText) {
+    ProfaneDetector detector = make_detector("fuck\nсука\n");
+    EXPECT_EQ(detector.censor("Привет, как дела? FUCK you, СУКА!", '*'), "Привет, как дела? **** you, ****!");
+}
+
+TEST(ProfaneDetectorDictionaryTest, InvisibleCharsAndMarksInsideWordMasked) {
+    ProfaneDetector detector = make_detector("fuck\n");
+    EXPECT_EQ(detector.censor("fu​ck f̶u̶c̶k̶!", '*'), "**** ****!");
 }
 
 TEST(ProfaneDetectorDictionaryTest, ContainsProfanity) {

@@ -1,11 +1,19 @@
 #include "profane_detector/profane_detector.hpp"
 
 std::string ProfaneDetector::censor(const std::string &text, const char censor_char) {
-    std::string censored_text = text;
-    unicode_normalizer.normalize(censored_text);
-    for (const Token& token : find_profane_tokens(censored_text)) {
-        censored_text.replace(token.start, token.end - token.start, token.end - token.start, censor_char);
+    std::string normalized_text = text;
+    std::vector<std::size_t> source_offsets;
+    unicode_normalizer.normalize(normalized_text, source_offsets);
+    std::string censored_text;
+    std::size_t copied = 0;
+    for (const Token& token : find_profane_tokens(normalized_text)) {
+        std::size_t start = source_offsets[token.start];
+        censored_text.append(text, copied, start - copied);
+        std::string span = normalized_text.substr(token.start, token.end - token.start);
+        censored_text.append(utf8_sizer.utf8_word_length(span), censor_char);
+        copied = source_offsets[token.end];
     }
+    censored_text.append(text, copied);
     return censored_text;
 }
 
