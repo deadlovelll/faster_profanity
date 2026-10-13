@@ -308,6 +308,12 @@ TEST_F(UnicodeNormalizerTest, SpecialSpacesBecomeSpace) {
     EXPECT_EQ(text, "a b c");
 }
 
+TEST_F(UnicodeNormalizerTest, SeparatorsAndBrailleBlankBecomeSpace) {
+    std::string text = "a\u2000b\u1680c\u2028d\u2029e\u2800f";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "a b c d e f");
+}
+
 TEST_F(UnicodeNormalizerTest, CompatibilityLettersWithInvisibleChars) {
     std::string text = "Ｓ\u200BＨ\u00ADＩＴ";
     normalizer.normalize(text);

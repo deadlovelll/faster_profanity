@@ -5,7 +5,7 @@
 struct utf8proc_property_struct;
 
 // Which normalization step a character needs. Regular ones are only lowercased
-enum class CharKind { Invisible, Compatibility, CaseFolding, Diacritic, Regular };
+enum class CharKind { Invisible, Space, Compatibility, CaseFolding, Diacritic, Regular };
 
 class CharClassifier {
 public:
@@ -14,4 +14,5 @@ private:
     DiacriticsStripper diacritics_stripper;
 
     CharKind classify_special(char32_t code_point, const utf8proc_property_struct* property);
+    bool is_space(char32_t code_point, const utf8proc_property_struct* property);
 };

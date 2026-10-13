@@ -15,7 +15,8 @@ CharKind CharClassifier::classify(char32_t code_point) {
         // standalone accent: U+0301
         || property->category == UTF8PROC_CATEGORY_MN
         // standalone enclosing mark: U+20DD
-        || property->category == UTF8PROC_CATEGORY_ME) [[unlikely]]
+        || property->category == UTF8PROC_CATEGORY_ME
+        || is_space(code_point, property)) [[unlikely]]
     {
         return classify_special(code_point, property);
     }
@@ -26,6 +27,9 @@ CharKind CharClassifier::classify_special(char32_t code_point, const utf8proc_pr
     // invisible: ZWSP, soft hyphen
     if (property->ignorable) {
         return CharKind::Invisible;
+    }
+    if (is_space(code_point, property)) {
+        return CharKind::Space;
     }
     // compatibility decomposition: Ｆ -> F, ﬁ -> fi
     if (property->decomp_type != 0) {
@@ -44,4 +48,9 @@ CharKind CharClassifier::classify_special(char32_t code_point, const utf8proc_pr
         return CharKind::CaseFolding;
     }
     return CharKind::Regular;
+}
+
+bool CharClassifier::is_space(char32_t code_point, const utf8proc_property_t* property) {
+    return property->category == UTF8PROC_CATEGORY_ZS || property->category == UTF8PROC_CATEGORY_ZL
+        || property->category == UTF8PROC_CATEGORY_ZP || code_point == U'⠀';
 }

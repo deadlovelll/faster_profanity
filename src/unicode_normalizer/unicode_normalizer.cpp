@@ -34,6 +34,10 @@ void UnicodeNormalizer::normalize(std::string& text) {
             case CharKind::Invisible:
                 pos += len;
                 continue;
+            case CharKind::Space:
+                out.push_back(' ');
+                pos += len;
+                continue;
             case CharKind::CaseFolding:
                 append_case_folded(out, current);
                 pos += len;

@@ -18,6 +18,14 @@ TEST_F(CharClassifierTest, InvisibleCharacters) {
     EXPECT_EQ(classifier.classify(U'­'), CharKind::Invisible);  // soft hyphen
 }
 
+TEST_F(CharClassifierTest, SpaceCharacters) {
+    EXPECT_EQ(classifier.classify(U' '), CharKind::Space);
+    EXPECT_EQ(classifier.classify(U' '), CharKind::Space);
+    EXPECT_EQ(classifier.classify(U' '), CharKind::Space);
+    EXPECT_EQ(classifier.classify(U' '), CharKind::Space);
+    EXPECT_EQ(classifier.classify(U'⠀'), CharKind::Space);
+}
+
 TEST_F(CharClassifierTest, CompatibilityCharacters) {
     EXPECT_EQ(classifier.classify(U'Ｆ'), CharKind::Compatibility);
     EXPECT_EQ(classifier.classify(U'ﬁ'), CharKind::Compatibility);
