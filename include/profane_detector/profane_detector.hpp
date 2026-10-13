@@ -6,7 +6,7 @@
 #include "censor_words_loader/censor_words_loader.hpp"
 #include "trie_loader/trie_loader.hpp"
 #include "swear_word_hider/swear_word_hider.hpp"
-#include "text_normalizer/text_normalizer.hpp"
+#include "unicode_normalizer/unicode_normalizer.hpp"
 
 class ProfaneDetector {
 public:
@@ -22,5 +22,5 @@ private:
     std::unique_ptr<Node> root;
     SwearWordHider swear_word_hider;
     CensorWordsLoader censor_words_loader;
-    TextNormalizer text_normalizer;
+    UnicodeNormalizer unicode_normalizer;
 };

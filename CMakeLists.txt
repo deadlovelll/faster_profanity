@@ -25,7 +25,6 @@ add_library(faster_profanity_lib
     src/censor_words_loader/censor_words_loader.cpp
     src/trie_loader/trie_loader.cpp
     src/utf8_sizer/utf8_sizer.cpp
-    src/text_normalizer/text_normalizer.cpp
     src/unicode_normalizer/unicode_normalizer.cpp
     src/diacritics_stripper/diacritics_stripper.cpp
     src/char_classifier/char_classifier.cpp
