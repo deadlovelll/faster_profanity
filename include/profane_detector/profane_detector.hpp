@@ -2,10 +2,12 @@
 
 #include <string>
 #include <unordered_set>
+#include <vector>
 
 #include "censor_words_loader/censor_words_loader.hpp"
 #include "trie_loader/trie_loader.hpp"
 #include "swear_word_hider/swear_word_hider.hpp"
+#include "tokenizer/tokenizer.hpp"
 #include "unicode_normalizer/unicode_normalizer.hpp"
 
 class ProfaneDetector {
@@ -23,4 +25,7 @@ private:
     SwearWordHider swear_word_hider;
     CensorWordsLoader censor_words_loader;
     UnicodeNormalizer unicode_normalizer;
+    Tokenizer tokenizer;
+
+    std::vector<Token> find_profane_tokens(const std::string& normalized_text);
 };
