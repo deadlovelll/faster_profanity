@@ -9,10 +9,14 @@
 const ConfusablesMapper::Table ConfusablesMapper::table = build_table();
 
 char ConfusablesMapper::to_latin(char32_t code_point) {
-    if (code_point < table.size()) {
-        return table[code_point];
+    if (code_point >= table.size()) [[unlikely]] {
+        return to_latin_beyond_table(code_point);
     }
-    // Rare letters beyond U+FFFF: binary search in the sorted list
+    return table[code_point];
+}
+
+// Rare letters beyond U+FFFF: binary search in the sorted list
+char ConfusablesMapper::to_latin_beyond_table(char32_t code_point) {
     std::array<Confusable, confusables.size()>::const_iterator found = std::ranges::lower_bound(
         confusables, code_point, {}, &Confusable::code_point
     );

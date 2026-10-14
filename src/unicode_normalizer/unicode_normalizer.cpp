@@ -15,123 +15,140 @@ template <bool with_offsets>
 void UnicodeNormalizer::normalize_text(std::string& text, std::vector<std::size_t>* source_offsets) {
     std::string out;
     out.reserve(text.size());
-
-    const utf8proc_uint8_t* bytes = reinterpret_cast<const utf8proc_uint8_t*>(text.data());
-    const utf8proc_ssize_t size = static_cast<utf8proc_ssize_t>(text.size());
-    utf8proc_ssize_t pos = 0;
-    utf8proc_ssize_t unit_start = 0;
     if constexpr (with_offsets) {
-        source_offsets->clear();
-        source_offsets->reserve(text.size() + 1);
+        reset_offsets(*source_offsets, text.size());
     }
-
+    const std::string_view source = text;
+    const std::ptrdiff_t size = static_cast<std::ptrdiff_t>(source.size());
+    std::ptrdiff_t pos = 0;
     while (pos < size) {
-        if constexpr (with_offsets) {
-            while (source_offsets->size() < out.size()) {
-                source_offsets->push_back(static_cast<std::size_t>(unit_start));
-            }
-            unit_start = pos;
-        }
-        // ASCII fast path: no ASCII character is invisible
-        if (bytes[pos] < 0x80) {
-            out.push_back(lower_ascii(static_cast<char>(bytes[pos])));
-            ++pos;
-            continue;
-        }
-
-        utf8proc_int32_t code_point;
-        utf8proc_ssize_t len = utf8proc_iterate(bytes + pos, size - pos, &code_point);
-        if (len < 0) {
-            out.push_back(static_cast<char>(bytes[pos]));
-            ++pos;
-            continue;
-        }
-
-        char32_t current = static_cast<char32_t>(code_point);
-        CharKind kind = char_classifier.classify(current);
-        recompose_separate_letter(bytes, size, pos, len, current, kind);
+        SourceChar source_char = read_char(source, pos);
+        CharKind kind = classify_char(source_char);
+        recompose_separate_letter(source, source_char, kind);
         switch (kind) {
+            case CharKind::Ascii:
+                out.push_back(lower_ascii(source[static_cast<std::size_t>(source_char.start)]));
+                break;
+            case CharKind::Invalid:
+                out.push_back(source[static_cast<std::size_t>(source_char.start)]);
+                break;
             case CharKind::Invisible:
-                pos += len;
-                continue;
+                break;
             case CharKind::Space:
                 out.push_back(' ');
-                pos += len;
-                continue;
+                break;
             case CharKind::CaseFolding:
-                append_case_folded(out, current);
-                pos += len;
-                continue;
+                append_case_folded(out, source_char.code_point);
+                break;
             case CharKind::Compatibility:
-                if (append_compatibility_form(out, current)) {
-                    pos += len;
-                    continue;
+                if (append_compatibility_form(out, source_char.code_point)) {
+                    break;
                 }
                 [[fallthrough]];
             case CharKind::Diacritic:
-                append_without_diacritics(out, current);
-                pos += len;
-                continue;
-            case CharKind::Mark:
-                if (diacritics_stripper.is_same_script(last_code_point(out), current)) {
-                    out.append(text, static_cast<std::size_t>(pos), static_cast<std::size_t>(len));
-                }
-                pos += len;
-                continue;
-            case CharKind::Regular:
+                append_without_diacritics(out, source_char.code_point);
                 break;
-        }
-
-        // Checked before lowering: some letters look Latin only in uppercase, Cyrillic В -> b
-        char latin = ConfusablesMapper::to_latin(current);
-        if (latin != 0) {
-            out.push_back(latin);
-            pos += len;
-            continue;
-        }
-
-        if (is_regional_indicator(current)) [[unlikely]] {
-            if (is_regional_indicator_at(text, pos - 4) || is_regional_indicator_at(text, pos + len)) {
-                out.append(text, static_cast<std::size_t>(pos), static_cast<std::size_t>(len));
-            } else {
-                out.push_back(static_cast<char>('a' + (current - U'\U0001F1E6')));
+            case CharKind::Mark:
+                if (diacritics_stripper.is_same_script(last_code_point(out), source_char.code_point)) {
+                    append_source(out, source_char, source);
+                }
+                break;
+            case CharKind::Regular: {
+                // Checked before lowering: some letters look Latin only in uppercase, Cyrillic В -> b
+                char latin = ConfusablesMapper::to_latin(source_char.code_point);
+                if (latin != 0) {
+                    out.push_back(latin);
+                    break;
+                }
+                if (is_regional_indicator(source_char.code_point)) [[unlikely]] {
+                    append_regional_indicator(out, source_char, source);
+                    break;
+                }
+                char32_t lowered = lower(source_char.code_point);
+                if (lowered == source_char.code_point) {
+                    append_source(out, source_char, source);
+                } else {
+                    append_code_point(out, lowered);
+                }
+                break;
             }
-            pos += len;
-            continue;
         }
-
-        char32_t lowered = lower(current);
-        if (lowered == current) {
-            out.append(text, static_cast<std::size_t>(pos), static_cast<std::size_t>(len));
-        } else {
-            append_code_point(out, lowered);
+        if constexpr (with_offsets) {
+            record_offsets(*source_offsets, out.size(), source_char.start);
         }
-        pos += len;
+        pos = source_char.end;
     }
     if constexpr (with_offsets) {
-        source_offsets->resize(out.size(), static_cast<std::size_t>(unit_start));
-        source_offsets->push_back(text.size());
+        close_offsets(*source_offsets, text.size());
     }
     text.swap(out);
 }
 
-void UnicodeNormalizer::recompose_separate_letter(
-    const std::uint8_t* bytes, std::ptrdiff_t size, std::ptrdiff_t pos, std::ptrdiff_t& len,
-    char32_t& code_point, CharKind& kind
+void UnicodeNormalizer::reset_offsets(std::vector<std::size_t>& source_offsets, std::size_t text_size) {
+    source_offsets.clear();
+    source_offsets.reserve(text_size + 1);
+}
+
+void UnicodeNormalizer::record_offsets(
+    std::vector<std::size_t>& source_offsets, std::size_t out_size, std::ptrdiff_t char_start
 ) {
+    while (source_offsets.size() < out_size) {
+        source_offsets.push_back(static_cast<std::size_t>(char_start));
+    }
+}
+
+void UnicodeNormalizer::close_offsets(std::vector<std::size_t>& source_offsets, std::size_t text_size) {
+    source_offsets.push_back(text_size);
+}
+
+UnicodeNormalizer::SourceChar UnicodeNormalizer::read_char(std::string_view text, std::ptrdiff_t pos) {
+    const utf8proc_uint8_t* bytes = reinterpret_cast<const utf8proc_uint8_t*>(text.data());
+    if (bytes[pos] < 0x80) {
+        return {bytes[pos], pos, pos + 1};
+    }
+    utf8proc_int32_t code_point;
+    utf8proc_ssize_t len = utf8proc_iterate(bytes + pos, static_cast<utf8proc_ssize_t>(text.size()) - pos, &code_point);
+    return {static_cast<char32_t>(code_point), pos, pos + (len > 0 ? len : 1)};
+}
+
+CharKind UnicodeNormalizer::classify_char(SourceChar source_char) {
+    if (source_char.code_point < 0x80) {
+        return CharKind::Ascii;
+    }
+    if (source_char.code_point > 0x10FFFF) {
+        return CharKind::Invalid;
+    }
+    return char_classifier.classify(source_char.code_point);
+}
+
+void UnicodeNormalizer::recompose_separate_letter(std::string_view text, SourceChar& source_char, CharKind& kind) {
+    const utf8proc_uint8_t* bytes = reinterpret_cast<const utf8proc_uint8_t*>(text.data());
+    const utf8proc_ssize_t size = static_cast<utf8proc_ssize_t>(text.size());
     if (
-        kind == CharKind::Regular && pos + len < size && bytes[pos + len] == 0xCC
-        && diacritics_stripper.is_separate_letter_base(code_point)) [[unlikely]]
+        kind == CharKind::Regular && source_char.end < size && bytes[source_char.end] == 0xCC
+        && diacritics_stripper.is_separate_letter_base(source_char.code_point)) [[unlikely]]
     {
         utf8proc_int32_t mark;
-        utf8proc_ssize_t mark_len = utf8proc_iterate(bytes + pos + len, size - pos - len, &mark);
-        char32_t separate_letter = diacritics_stripper.compose_separate_letter(code_point, static_cast<char32_t>(mark));
+        utf8proc_ssize_t mark_len = utf8proc_iterate(bytes + source_char.end, size - source_char.end, &mark);
+        char32_t separate_letter = diacritics_stripper.compose_separate_letter(source_char.code_point, static_cast<char32_t>(mark));
         if (separate_letter != 0) {
-            code_point = separate_letter;
-            len += mark_len;
+            source_char.code_point = separate_letter;
+            source_char.end += mark_len;
             kind = CharKind::Diacritic;
         }
     }
+}
+
+void UnicodeNormalizer::append_regional_indicator(std::string& out, SourceChar source_char, std::string_view text) {
+    if (is_regional_indicator_at(text, source_char.start - 4) || is_regional_indicator_at(text, source_char.end)) {
+        append_source(out, source_char, text);
+    } else {
+        out.push_back(static_cast<char>('a' + (source_char.code_point - U'\U0001F1E6')));
+    }
+}
+
+void UnicodeNormalizer::append_source(std::string& out, SourceChar source_char, std::string_view text) {
+    out.append(text.data() + source_char.start, static_cast<std::size_t>(source_char.end - source_char.start));
 }
 
 bool UnicodeNormalizer::append_compatibility_form(std::string& out, char32_t code_point) {
@@ -225,7 +242,7 @@ bool UnicodeNormalizer::is_regional_indicator(char32_t code_point) {
     return code_point >= U'\U0001F1E6' && code_point <= U'\U0001F1FF';
 }
 
-bool UnicodeNormalizer::is_regional_indicator_at(const std::string& text, std::ptrdiff_t pos) {
+bool UnicodeNormalizer::is_regional_indicator_at(std::string_view text, std::ptrdiff_t pos) {
     if (pos < 0 || pos + 4 > static_cast<std::ptrdiff_t>(text.size())) {
         return false;
     }

@@ -12,5 +12,6 @@ private:
 
     static const Table table;
 
+    static char to_latin_beyond_table(char32_t code_point);
     static Table build_table();
 };
