@@ -46,6 +46,7 @@ TEST_F(CharClassifierTest, StandaloneMarks) {
     EXPECT_EQ(classifier.classify(U'⃝'), CharKind::Diacritic);  // combining enclosing circle
 }
 
-TEST_F(CharClassifierTest, IndicMarkIsRegular) {
-    EXPECT_EQ(classifier.classify(U'़'), CharKind::Regular);  // Devanagari nukta
+TEST_F(CharClassifierTest, IndicMarkIsMark) {
+    EXPECT_EQ(classifier.classify(U'़'), CharKind::Mark);  // Devanagari nukta
+    EXPECT_EQ(classifier.classify(U'\u093E'), CharKind::Mark);
 }

@@ -16,6 +16,7 @@ CharKind CharClassifier::classify(char32_t code_point) {
         || property->category == UTF8PROC_CATEGORY_MN
         // standalone enclosing mark: U+20DD
         || property->category == UTF8PROC_CATEGORY_ME
+        || property->category == UTF8PROC_CATEGORY_MC
         || is_space(code_point, property)) [[unlikely]]
     {
         return classify_special(code_point, property);
@@ -31,16 +32,19 @@ CharKind CharClassifier::classify_special(char32_t code_point, const utf8proc_pr
     if (is_space(code_point, property)) {
         return CharKind::Space;
     }
+    // standalone accent: Zalgo, f + U+0336
+    if (
+        property->category == UTF8PROC_CATEGORY_MN || property->category == UTF8PROC_CATEGORY_MC
+        || property->category == UTF8PROC_CATEGORY_ME)
+    {
+        return diacritics_stripper.is_diacritic_mark(code_point) ? CharKind::Diacritic : CharKind::Mark;
+    }
     // compatibility decomposition: Ｆ -> F, ﬁ -> fi
     if (property->decomp_type != 0) {
         return CharKind::Compatibility;
     }
-    if (
-        // accented letter: é -> e + U+0301
-        property->decomp_seqindex != UINT16_MAX
-        // standalone accent: Zalgo, f + U+0336
-        || diacritics_stripper.is_diacritic_mark(code_point))
-    {
+    // accented letter: é -> e + U+0301
+    if (property->decomp_seqindex != UINT16_MAX) {
         return CharKind::Diacritic;
     }
     // fold differs from lowercase: ß -> ss

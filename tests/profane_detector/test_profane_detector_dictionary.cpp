@@ -57,6 +57,7 @@ TEST(ProfaneDetectorDictionaryTest, CensorKeepsOriginalText) {
 TEST(ProfaneDetectorDictionaryTest, InvisibleCharsAndMarksInsideWordMasked) {
     ProfaneDetector detector = make_detector("fuck\n");
     EXPECT_EQ(detector.censor("fu​ck f̶u̶c̶k̶!", '*'), "**** ****!");
+    EXPECT_EQ(detector.censor("fu\u0E48ck", '*'), "****");
 }
 
 TEST(ProfaneDetectorDictionaryTest, OneCensorCharPerOriginalCharacter) {

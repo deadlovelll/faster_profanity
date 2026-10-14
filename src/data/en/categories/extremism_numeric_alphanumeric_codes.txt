@@ -9,6 +9,7 @@
 2316
 33/6
 8814
+combat 18
 iotbw
 rwds
 tkd

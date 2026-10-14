@@ -72,6 +72,12 @@ void UnicodeNormalizer::normalize_text(std::string& text, std::vector<std::size_
                 append_without_diacritics(out, current);
                 pos += len;
                 continue;
+            case CharKind::Mark:
+                if (diacritics_stripper.is_same_script(last_code_point(out), current)) {
+                    out.append(text, static_cast<std::size_t>(pos), static_cast<std::size_t>(len));
+                }
+                pos += len;
+                continue;
             case CharKind::Regular:
                 break;
         }
@@ -226,6 +232,22 @@ bool UnicodeNormalizer::is_regional_indicator_at(const std::string& text, std::p
     utf8proc_int32_t code_point;
     utf8proc_ssize_t len = utf8proc_iterate(reinterpret_cast<const utf8proc_uint8_t*>(text.data()) + pos, 4, &code_point);
     return len == 4 && is_regional_indicator(static_cast<char32_t>(code_point));
+}
+
+char32_t UnicodeNormalizer::last_code_point(const std::string& text) {
+    std::size_t start = text.size();
+    while (start > 0 && text.size() - start < 4) {
+        --start;
+        if ((static_cast<unsigned char>(text[start]) & 0xC0) != 0x80) {
+            utf8proc_int32_t code_point;
+            utf8proc_ssize_t len = utf8proc_iterate(
+                reinterpret_cast<const utf8proc_uint8_t*>(text.data()) + start,
+                static_cast<utf8proc_ssize_t>(text.size() - start), &code_point
+            );
+            return len == static_cast<utf8proc_ssize_t>(text.size() - start) ? static_cast<char32_t>(code_point) : 0;
+        }
+    }
+    return 0;
 }
 
 char32_t UnicodeNormalizer::lower(char32_t code_point) {

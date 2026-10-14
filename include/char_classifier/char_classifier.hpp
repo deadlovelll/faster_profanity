@@ -5,7 +5,7 @@
 struct utf8proc_property_struct;
 
 // Which normalization step a character needs. Regular ones are only lowercased
-enum class CharKind { Invisible, Space, Compatibility, CaseFolding, Diacritic, Regular };
+enum class CharKind { Invisible, Space, Compatibility, CaseFolding, Diacritic, Mark, Regular };
 
 class CharClassifier {
 public:

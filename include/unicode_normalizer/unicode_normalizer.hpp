@@ -33,6 +33,7 @@ private:
     void append_code_point(std::string& out, char32_t code_point);
     bool is_regional_indicator(char32_t code_point);
     bool is_regional_indicator_at(const std::string& text, std::ptrdiff_t pos);
+    char32_t last_code_point(const std::string& text);
     char32_t lower(char32_t code_point);
     char lower_ascii(char c);
 };

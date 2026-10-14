@@ -3,7 +3,27 @@
 #include <initializer_list>
 #include <vector>
 
+#include "combining_marks.hpp"
 #include "unicode_normalizer/unicode_normalizer.hpp"
+
+static std::string utf8(char32_t code_point) {
+    if (code_point < 0x80) {
+        return std::string(1, static_cast<char>(code_point));
+    }
+    if (code_point < 0x800) {
+        return {static_cast<char>(0xC0 | (code_point >> 6)), static_cast<char>(0x80 | (code_point & 0x3F))};
+    }
+    if (code_point < 0x10000) {
+        return {
+            static_cast<char>(0xE0 | (code_point >> 12)), static_cast<char>(0x80 | ((code_point >> 6) & 0x3F)),
+            static_cast<char>(0x80 | (code_point & 0x3F))
+        };
+    }
+    return {
+        static_cast<char>(0xF0 | (code_point >> 18)), static_cast<char>(0x80 | ((code_point >> 12) & 0x3F)),
+        static_cast<char>(0x80 | ((code_point >> 6) & 0x3F)), static_cast<char>(0x80 | (code_point & 0x3F))
+    };
+}
 
 class UnicodeNormalizerTest : public ::testing::Test {
 protected:
@@ -429,6 +449,49 @@ TEST_F(UnicodeNormalizerTest, IndicMarksKept) {
     std::string text = "चूतिया क़";
     normalizer.normalize(text);
     EXPECT_EQ(text, "चूतिया क़");
+}
+
+TEST_F(UnicodeNormalizerTest, MarksOfOtherScriptsRemoved) {
+    std::string text = "s\u0E48hit s\u0E48\u0E48hit f\u064Fuck с\u0650ука क\u0E48 s\u093Ehit";
+    normalizer.normalize(text);
+    EXPECT_EQ(text, "shit shit fuck cyka क shit");
+}
+
+TEST_F(UnicodeNormalizerTest, MarksOfOwnScriptKept) {
+    std::string text = "ไม้ ส้้ كُسّ か\u3099 क\u093E";
+    std::string expected = text;
+    normalizer.normalize(text);
+    EXPECT_EQ(text, expected);
+}
+
+TEST_F(UnicodeNormalizerTest, EveryMarkRemovedInsideLatinWord) {
+    std::vector<char32_t> kept;
+    for (const CombiningMarks& marks : combining_marks) {
+        for (char32_t mark = marks.first; mark <= marks.last; ++mark) {
+            std::string text = "s" + utf8(mark) + "hit";
+            normalizer.normalize(text);
+            if (text != "shit") {
+                kept.push_back(mark);
+            }
+        }
+    }
+    EXPECT_EQ(kept, std::vector<char32_t>{});
+}
+
+TEST_F(UnicodeNormalizerTest, EveryMarkKeptAfterLetterOfItsScript) {
+    std::vector<char32_t> removed;
+    for (const CombiningMarks& marks : combining_marks) {
+        for (char32_t mark = marks.first; marks.letter != 0 && mark <= marks.last; ++mark) {
+            std::string expected = utf8(marks.letter);
+            normalizer.normalize(expected);
+            std::string text = utf8(marks.letter) + utf8(mark);
+            normalizer.normalize(text);
+            if (text != expected + utf8(mark)) {
+                removed.push_back(mark);
+            }
+        }
+    }
+    EXPECT_EQ(removed, std::vector<char32_t>{});
 }
 
 TEST_F(UnicodeNormalizerTest, HangulUnchanged) {

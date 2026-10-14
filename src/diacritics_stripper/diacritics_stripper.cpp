@@ -1,11 +1,16 @@
 #include "diacritics_stripper/diacritics_stripper.hpp"
 #include "diacritics_stripper/diacritic_marks.hpp"
+#include "diacritics_stripper/scripts.hpp"
 #include "diacritics_stripper/separate_letters.hpp"
+
+#include <algorithm>
+#include <iterator>
 
 #include <utf8proc.h>
 
 // Letters below U+2000 (Latin, Greek, Cyrillic) are stripped once, at program start: one lookup per letter
 const DiacriticsStripper::Table DiacriticsStripper::table = DiacriticsStripper().build_table();
+const DiacriticsStripper::ScriptTable DiacriticsStripper::script_table = DiacriticsStripper().build_script_table();
 
 int DiacriticsStripper::strip(char32_t code_point, char32_t* stripped) {
     if (code_point < table.size() && table[code_point] != 0) {
@@ -22,6 +27,11 @@ bool DiacriticsStripper::is_diacritic_mark(char32_t code_point) {
         }
     }
     return false;
+}
+
+bool DiacriticsStripper::is_same_script(char32_t letter, char32_t mark) {
+    Script script = script_of(mark);
+    return script != Script::None && script == script_of(letter);
 }
 
 char32_t DiacriticsStripper::compose_separate_letter(char32_t letter, char32_t mark) {
@@ -50,6 +60,18 @@ DiacriticsStripper::Table DiacriticsStripper::build_table() {
         if (strip_uncached(c, stripped) == 1) {
             built[c] = static_cast<char16_t>(stripped[0]);
         }
+    }
+    return built;
+}
+
+DiacriticsStripper::ScriptTable DiacriticsStripper::build_script_table() {
+    ScriptTable built{};
+    std::size_t range = 0;
+    for (char32_t c = 0; c < built.size(); ++c) {
+        if (range + 1 < script_ranges.size() && script_ranges[range + 1].first == c) {
+            ++range;
+        }
+        built[c] = script_ranges[range].script;
     }
     return built;
 }
@@ -97,4 +119,14 @@ bool DiacriticsStripper::is_separate_letter(char32_t code_point) {
         }
     }
     return false;
+}
+
+Script DiacriticsStripper::script_of(char32_t code_point) {
+    if (code_point < script_table.size()) {
+        return script_table[code_point];
+    }
+    std::array<ScriptRange, script_ranges.size()>::const_iterator next = std::ranges::upper_bound(
+        script_ranges, code_point, {}, &ScriptRange::first
+    );
+    return std::prev(next)->script;
 }
