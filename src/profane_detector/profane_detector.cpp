@@ -9,8 +9,11 @@ std::string ProfaneDetector::censor(const std::string &text, const char censor_c
     for (const Token& token : find_profane_tokens(normalized_text)) {
         std::size_t start = source_offsets[token.start];
         censored_text.append(text, copied, start - copied);
-        std::string span = normalized_text.substr(token.start, token.end - token.start);
-        censored_text.append(utf8_sizer.utf8_word_length(span), censor_char);
+        for (std::size_t i = token.start; i < token.end; ++i) {
+            if (i == token.start || source_offsets[i] != source_offsets[i - 1]) {
+                censored_text.push_back(censor_char);
+            }
+        }
         copied = source_offsets[token.end];
     }
     censored_text.append(text, copied);
