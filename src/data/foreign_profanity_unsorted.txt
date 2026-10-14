@@ -4,20 +4,47 @@
 
 # ar - Arabic
 abeed
+bakri
+bakriyyah
+baqiya wa tatamadad
+dawlat al-islam qamat
+khadima
+khaybar khaybar ya yahud
+majus
+nasabi
+nawasib
+nusayri
+rafida
+rafidha
+rafidi
+rawafid
+safawi
+salil al-sawarim
 sharmuta
+ummati qad laha fajrun
 zubb
+
+# bn - Bengali
+malaun
 
 # de - German
 arschloch
+blut und boden
+blut und ehre
+bruder schweigen
 ficken
 fotze
 judensau
 kanake
+meine ehre heisst treue
 muschi
 nutte
 piefke
 scheiss
 schlampe
+schwarze sonne
+weiss macht
+weisser macht
 wichser
 
 # es - Spanish
@@ -49,6 +76,7 @@ mierda
 pendejo
 perra
 polla
+pollero
 puta
 puto
 soplapollas
@@ -89,8 +117,22 @@ arabush
 cushi
 
 # hi - Hindi
+bhangi
+bheemti
+bhimta
+bhimte
+chamaar
+chamriya
+chappri
 chut
+gaumutra drinker
+gaumutra drinkers
+mleccha
+mullo
 penchod
+quotawala
+reservation-wala
+sulli
 
 # hr - Croatian/Serbian
 kurac
@@ -146,6 +188,11 @@ klootzak
 faen
 knulle
 kuksuger
+
+# pa - Punjabi
+chooray
+chuhra
+dunki
 
 # pl - Polish
 chuj
@@ -230,6 +277,11 @@ orospu
 # uk - Ukrainian (Latin transliteration)
 katsap
 moskal
+
+# ur - Urdu
+isai
+mirzai
+qadiani
 
 # zh - Cantonese/Chinese (romanized)
 gwailo
