@@ -1,9 +1,6 @@
 #include "unicode_normalizer/unicode_normalizer.hpp"
 #include "confusables_mapper/confusables_mapper.hpp"
 
-#include <algorithm>
-#include <cstring>
-
 #include <utf8proc.h>
 
 void UnicodeNormalizer::normalize(std::string& text) {
@@ -18,8 +15,9 @@ template <bool with_offsets>
 void UnicodeNormalizer::normalize_text(std::string& text, std::vector<std::size_t>* source_offsets) {
     std::string normalized;
     OutputBuffer out(normalized, text.size());
+    OffsetsBuffer offsets;
     if constexpr (with_offsets) {
-        reset_offsets(*source_offsets, text.size());
+        offsets = OffsetsBuffer(*source_offsets, text.size() + 1);
     }
     const std::string_view source = text;
     const std::ptrdiff_t size = static_cast<std::ptrdiff_t>(source.size());
@@ -75,38 +73,34 @@ void UnicodeNormalizer::normalize_text(std::string& text, std::vector<std::size_
             }
         }
         if constexpr (with_offsets) {
-            record_offsets(*source_offsets, out.size(), source_char.start);
+            offsets = record_offsets(offsets, out.size(), source_char.start);
         }
         pos = source_char.end;
     }
     if constexpr (with_offsets) {
-        close_offsets(*source_offsets, text.size());
+        offsets.push_back(text.size());
+        offsets.finish();
     }
     out.finish();
     text.swap(normalized);
 }
 
-void UnicodeNormalizer::reset_offsets(std::vector<std::size_t>& source_offsets, std::size_t text_size) {
-    source_offsets.clear();
-    source_offsets.reserve(text_size + 1);
-}
-
-void UnicodeNormalizer::record_offsets(
-    std::vector<std::size_t>& source_offsets, std::size_t out_size, std::ptrdiff_t char_start
+OffsetsBuffer UnicodeNormalizer::record_offsets(
+    OffsetsBuffer offsets, std::size_t out_size, std::ptrdiff_t char_start
 ) {
-    while (source_offsets.size() < out_size) {
-        source_offsets.push_back(static_cast<std::size_t>(char_start));
+    while (offsets.size() < out_size) {
+        offsets.push_back(static_cast<std::size_t>(char_start));
     }
+    return offsets;
 }
 
-void UnicodeNormalizer::close_offsets(std::vector<std::size_t>& source_offsets, std::size_t text_size) {
-    source_offsets.push_back(text_size);
-}
-
-UnicodeNormalizer::SourceChar UnicodeNormalizer::read_char(std::string_view text, std::ptrdiff_t pos) {
+SourceChar UnicodeNormalizer::read_char(std::string_view text, std::ptrdiff_t pos) {
     const utf8proc_uint8_t* bytes = reinterpret_cast<const utf8proc_uint8_t*>(text.data());
     if (bytes[pos] < 0x80) {
         return {bytes[pos], pos, pos + 1};
+    }
+    if (is_two_byte_char(text, pos)) {
+        return {static_cast<char32_t>(((bytes[pos] & 0x1F) << 6) | (bytes[pos + 1] & 0x3F)), pos, pos + 2};
     }
     utf8proc_int32_t code_point;
     utf8proc_ssize_t len = utf8proc_iterate(bytes + pos, static_cast<utf8proc_ssize_t>(text.size()) - pos, &code_point);
@@ -141,7 +135,7 @@ void UnicodeNormalizer::recompose_separate_letter(std::string_view text, SourceC
     }
 }
 
-UnicodeNormalizer::OutputBuffer UnicodeNormalizer::append_regional_indicator(
+OutputBuffer UnicodeNormalizer::append_regional_indicator(
     OutputBuffer out, SourceChar source_char, std::string_view text
 ) {
     if (is_regional_indicator_at(text, source_char.start - 4) || is_regional_indicator_at(text, source_char.end)) {
@@ -152,14 +146,14 @@ UnicodeNormalizer::OutputBuffer UnicodeNormalizer::append_regional_indicator(
     return out;
 }
 
-UnicodeNormalizer::OutputBuffer UnicodeNormalizer::append_source(
+OutputBuffer UnicodeNormalizer::append_source(
     OutputBuffer out, SourceChar source_char, std::string_view text
 ) {
     out.append(text.data() + source_char.start, static_cast<std::size_t>(source_char.end - source_char.start));
     return out;
 }
 
-UnicodeNormalizer::OutputBuffer UnicodeNormalizer::append_compatibility_form(OutputBuffer out, char32_t code_point) {
+OutputBuffer UnicodeNormalizer::append_compatibility_form(OutputBuffer out, char32_t code_point) {
     // The longest compatibility decomposition is 18 code points (U+FDFA).
     // 32 leaves headroom for future.
     // See https://stackoverflow.com/questions/61779904
@@ -199,7 +193,7 @@ UnicodeNormalizer::OutputBuffer UnicodeNormalizer::append_compatibility_form(Out
     return out;
 }
 
-UnicodeNormalizer::OutputBuffer UnicodeNormalizer::append_case_folded(OutputBuffer out, char32_t code_point) {
+OutputBuffer UnicodeNormalizer::append_case_folded(OutputBuffer out, char32_t code_point) {
     // The longest full case folding is 3 code points (ΐ)
     const utf8proc_ssize_t capacity = 4;
     utf8proc_int32_t folded[capacity];
@@ -222,7 +216,7 @@ UnicodeNormalizer::OutputBuffer UnicodeNormalizer::append_case_folded(OutputBuff
     return out;
 }
 
-UnicodeNormalizer::OutputBuffer UnicodeNormalizer::append_without_diacritics(OutputBuffer out, char32_t code_point) {
+OutputBuffer UnicodeNormalizer::append_without_diacritics(OutputBuffer out, char32_t code_point) {
     char32_t stripped[4];
     int count = diacritics_stripper.strip(code_point, stripped);
     for (int i = 0; i < count; ++i) {
@@ -231,7 +225,7 @@ UnicodeNormalizer::OutputBuffer UnicodeNormalizer::append_without_diacritics(Out
     return out;
 }
 
-UnicodeNormalizer::OutputBuffer UnicodeNormalizer::append_code_point(OutputBuffer out, char32_t code_point) {
+OutputBuffer UnicodeNormalizer::append_code_point(OutputBuffer out, char32_t code_point) {
     if (code_point < 0x80) {
         out.push_back(static_cast<char>(code_point));
         return out;
@@ -245,6 +239,12 @@ UnicodeNormalizer::OutputBuffer UnicodeNormalizer::append_code_point(OutputBuffe
     utf8proc_ssize_t encoded_len = utf8proc_encode_char(static_cast<utf8proc_int32_t>(code_point), encoded);
     out.append(reinterpret_cast<const char*>(encoded), static_cast<std::size_t>(encoded_len));
     return out;
+}
+
+bool UnicodeNormalizer::is_two_byte_char(std::string_view text, std::ptrdiff_t pos) {
+    const utf8proc_uint8_t* bytes = reinterpret_cast<const utf8proc_uint8_t*>(text.data());
+    return bytes[pos] >= 0xC2 && bytes[pos] <= 0xDF && pos + 1 < static_cast<std::ptrdiff_t>(text.size())
+        && (bytes[pos + 1] & 0xC0) == 0x80;
 }
 
 bool UnicodeNormalizer::is_regional_indicator(char32_t code_point) {
@@ -285,45 +285,4 @@ char UnicodeNormalizer::lower_ascii(char c) {
         return static_cast<char>(c - 'A' + 'a');
     }
     return c;
-}
-
-UnicodeNormalizer::OutputBuffer::OutputBuffer(std::string& storage, std::size_t capacity)
-    : storage(&storage), data(nullptr), used(0), capacity(capacity) {
-    storage.resize(capacity);
-    data = storage.data();
-}
-
-void UnicodeNormalizer::OutputBuffer::push_back(char c) {
-    if (used == capacity) [[unlikely]] {
-        data = grow(*storage, used + 1);
-        capacity = storage->size();
-    }
-    data[used] = c;
-    ++used;
-}
-
-void UnicodeNormalizer::OutputBuffer::append(const char* bytes, std::size_t count) {
-    if (capacity - used < count) [[unlikely]] {
-        data = grow(*storage, used + count);
-        capacity = storage->size();
-    }
-    std::memcpy(data + used, bytes, count);
-    used += count;
-}
-
-std::size_t UnicodeNormalizer::OutputBuffer::size() const {
-    return used;
-}
-
-std::string_view UnicodeNormalizer::OutputBuffer::view() const {
-    return std::string_view(data, used);
-}
-
-void UnicodeNormalizer::OutputBuffer::finish() {
-    storage->resize(used);
-}
-
-char* UnicodeNormalizer::OutputBuffer::grow(std::string& storage, std::size_t needed) {
-    storage.resize(std::max(storage.size() * 2, needed));
-    return storage.data();
 }

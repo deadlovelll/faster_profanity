@@ -8,6 +8,9 @@
 
 #include "char_classifier/char_classifier.hpp"
 #include "diacritics_stripper/diacritics_stripper.hpp"
+#include "offsets_buffer/offsets_buffer.hpp"
+#include "output_buffer/output_buffer.hpp"
+#include "source_char/source_char.hpp"
 
 // Unambiguous per-character canonicalization done in a single pass over UTF-8 text:
 // removes invisible characters, replaces compatibility characters (fullwidth, mathematical,
@@ -18,38 +21,13 @@ public:
     void normalize(std::string& text);
     void normalize(std::string& text, std::vector<std::size_t>& source_offsets);
 private:
-    struct SourceChar {
-        char32_t code_point;
-        std::ptrdiff_t start;
-        std::ptrdiff_t end;
-    };
-
-    class [[nodiscard]] OutputBuffer {
-    public:
-        OutputBuffer(std::string& storage, std::size_t capacity);
-        void push_back(char c);
-        void append(const char* bytes, std::size_t count);
-        std::size_t size() const;
-        std::string_view view() const;
-        void finish();
-    private:
-        std::string* storage;
-        char* data;
-        std::size_t used;
-        std::size_t capacity;
-
-        static char* grow(std::string& storage, std::size_t needed);
-    };
-
     CharClassifier char_classifier;
     DiacriticsStripper diacritics_stripper;
 
     template <bool with_offsets>
     void normalize_text(std::string& text, std::vector<std::size_t>* source_offsets);
 
-    void reset_offsets(std::vector<std::size_t>& source_offsets, std::size_t text_size);
-    void record_offsets(std::vector<std::size_t>& source_offsets, std::size_t out_size, std::ptrdiff_t char_start);
-    void close_offsets(std::vector<std::size_t>& source_offsets, std::size_t text_size);
+    OffsetsBuffer record_offsets(OffsetsBuffer offsets, std::size_t out_size, std::ptrdiff_t char_start);
     SourceChar read_char(std::string_view text, std::ptrdiff_t pos);
     CharKind classify_char(SourceChar source_char);
     void recompose_separate_letter(std::string_view text, SourceChar& source_char, CharKind& kind);
@@ -59,6 +37,7 @@ private:
     OutputBuffer append_case_folded(OutputBuffer out, char32_t code_point);
     OutputBuffer append_without_diacritics(OutputBuffer out, char32_t code_point);
     OutputBuffer append_code_point(OutputBuffer out, char32_t code_point);
+    bool is_two_byte_char(std::string_view text, std::ptrdiff_t pos);
     bool is_regional_indicator(char32_t code_point);
     bool is_regional_indicator_at(std::string_view text, std::ptrdiff_t pos);
     char32_t last_code_point(std::string_view text);
