@@ -1,6 +1,9 @@
 #include "unicode_normalizer/unicode_normalizer.hpp"
 #include "confusables_mapper/confusables_mapper.hpp"
 
+#include <algorithm>
+#include <cstring>
+
 #include <utf8proc.h>
 
 void UnicodeNormalizer::normalize(std::string& text) {
@@ -13,8 +16,8 @@ void UnicodeNormalizer::normalize(std::string& text, std::vector<std::size_t>& s
 
 template <bool with_offsets>
 void UnicodeNormalizer::normalize_text(std::string& text, std::vector<std::size_t>* source_offsets) {
-    std::string out;
-    out.reserve(text.size());
+    std::string normalized;
+    OutputBuffer out(normalized, text.size());
     if constexpr (with_offsets) {
         reset_offsets(*source_offsets, text.size());
     }
@@ -38,19 +41,17 @@ void UnicodeNormalizer::normalize_text(std::string& text, std::vector<std::size_
                 out.push_back(' ');
                 break;
             case CharKind::CaseFolding:
-                append_case_folded(out, source_char.code_point);
+                out = append_case_folded(out, source_char.code_point);
                 break;
             case CharKind::Compatibility:
-                if (append_compatibility_form(out, source_char.code_point)) {
-                    break;
-                }
-                [[fallthrough]];
+                out = append_compatibility_form(out, source_char.code_point);
+                break;
             case CharKind::Diacritic:
-                append_without_diacritics(out, source_char.code_point);
+                out = append_without_diacritics(out, source_char.code_point);
                 break;
             case CharKind::Mark:
-                if (diacritics_stripper.is_same_script(last_code_point(out), source_char.code_point)) {
-                    append_source(out, source_char, source);
+                if (diacritics_stripper.is_same_script(last_code_point(out.view()), source_char.code_point)) {
+                    out = append_source(out, source_char, source);
                 }
                 break;
             case CharKind::Regular: {
@@ -61,14 +62,14 @@ void UnicodeNormalizer::normalize_text(std::string& text, std::vector<std::size_
                     break;
                 }
                 if (is_regional_indicator(source_char.code_point)) [[unlikely]] {
-                    append_regional_indicator(out, source_char, source);
+                    out = append_regional_indicator(out, source_char, source);
                     break;
                 }
                 char32_t lowered = lower(source_char.code_point);
                 if (lowered == source_char.code_point) {
-                    append_source(out, source_char, source);
+                    out = append_source(out, source_char, source);
                 } else {
-                    append_code_point(out, lowered);
+                    out = append_code_point(out, lowered);
                 }
                 break;
             }
@@ -81,7 +82,8 @@ void UnicodeNormalizer::normalize_text(std::string& text, std::vector<std::size_
     if constexpr (with_offsets) {
         close_offsets(*source_offsets, text.size());
     }
-    text.swap(out);
+    out.finish();
+    text.swap(normalized);
 }
 
 void UnicodeNormalizer::reset_offsets(std::vector<std::size_t>& source_offsets, std::size_t text_size) {
@@ -139,19 +141,25 @@ void UnicodeNormalizer::recompose_separate_letter(std::string_view text, SourceC
     }
 }
 
-void UnicodeNormalizer::append_regional_indicator(std::string& out, SourceChar source_char, std::string_view text) {
+UnicodeNormalizer::OutputBuffer UnicodeNormalizer::append_regional_indicator(
+    OutputBuffer out, SourceChar source_char, std::string_view text
+) {
     if (is_regional_indicator_at(text, source_char.start - 4) || is_regional_indicator_at(text, source_char.end)) {
-        append_source(out, source_char, text);
+        out = append_source(out, source_char, text);
     } else {
         out.push_back(static_cast<char>('a' + (source_char.code_point - U'\U0001F1E6')));
     }
+    return out;
 }
 
-void UnicodeNormalizer::append_source(std::string& out, SourceChar source_char, std::string_view text) {
+UnicodeNormalizer::OutputBuffer UnicodeNormalizer::append_source(
+    OutputBuffer out, SourceChar source_char, std::string_view text
+) {
     out.append(text.data() + source_char.start, static_cast<std::size_t>(source_char.end - source_char.start));
+    return out;
 }
 
-bool UnicodeNormalizer::append_compatibility_form(std::string& out, char32_t code_point) {
+UnicodeNormalizer::OutputBuffer UnicodeNormalizer::append_compatibility_form(OutputBuffer out, char32_t code_point) {
     // The longest compatibility decomposition is 18 code points (U+FDFA).
     // 32 leaves headroom for future.
     // See https://stackoverflow.com/questions/61779904
@@ -164,7 +172,7 @@ bool UnicodeNormalizer::append_compatibility_form(std::string& out, char32_t cod
     );
     for (utf8proc_ssize_t i = 0; count <= capacity && i < count; ++i) {
         if (diacritics_stripper.is_diacritic_mark(static_cast<char32_t>(decomposed[i]))) {
-            return false;
+            return append_without_diacritics(out, code_point);
         }
     }
     if (count > 0 && count <= capacity) {
@@ -173,8 +181,7 @@ bool UnicodeNormalizer::append_compatibility_form(std::string& out, char32_t cod
         );
     }
     if (count <= 0 || count > capacity) {
-        append_code_point(out, lower(code_point));
-        return true;
+        return append_code_point(out, lower(code_point));
     }
 
     // There can be cases that leave the parentheses:
@@ -187,12 +194,12 @@ bool UnicodeNormalizer::append_compatibility_form(std::string& out, char32_t cod
     }
 
     for (utf8proc_ssize_t i = 0; i < count; ++i) {
-        append_code_point(out, lower(static_cast<char32_t>(decomposed[i])));
+        out = append_code_point(out, lower(static_cast<char32_t>(decomposed[i])));
     }
-    return true;
+    return out;
 }
 
-void UnicodeNormalizer::append_case_folded(std::string& out, char32_t code_point) {
+UnicodeNormalizer::OutputBuffer UnicodeNormalizer::append_case_folded(OutputBuffer out, char32_t code_point) {
     // The longest full case folding is 3 code points (ΐ)
     const utf8proc_ssize_t capacity = 4;
     utf8proc_int32_t folded[capacity];
@@ -206,36 +213,38 @@ void UnicodeNormalizer::append_case_folded(std::string& out, char32_t code_point
         );
     }
     if (count <= 0 || count > capacity) {
-        append_code_point(out, lower(code_point));
-        return;
+        return append_code_point(out, lower(code_point));
     }
 
     for (utf8proc_ssize_t i = 0; i < count; ++i) {
-        append_code_point(out, static_cast<char32_t>(folded[i]));
+        out = append_code_point(out, static_cast<char32_t>(folded[i]));
     }
+    return out;
 }
 
-void UnicodeNormalizer::append_without_diacritics(std::string& out, char32_t code_point) {
+UnicodeNormalizer::OutputBuffer UnicodeNormalizer::append_without_diacritics(OutputBuffer out, char32_t code_point) {
     char32_t stripped[4];
     int count = diacritics_stripper.strip(code_point, stripped);
     for (int i = 0; i < count; ++i) {
-        append_code_point(out, stripped[i]);
+        out = append_code_point(out, stripped[i]);
     }
+    return out;
 }
 
-void UnicodeNormalizer::append_code_point(std::string& out, char32_t code_point) {
+UnicodeNormalizer::OutputBuffer UnicodeNormalizer::append_code_point(OutputBuffer out, char32_t code_point) {
     if (code_point < 0x80) {
         out.push_back(static_cast<char>(code_point));
-        return;
+        return out;
     }
     char latin = ConfusablesMapper::to_latin(code_point);
     if (latin != 0) {
         out.push_back(latin);
-        return;
+        return out;
     }
     utf8proc_uint8_t encoded[4];
     utf8proc_ssize_t encoded_len = utf8proc_encode_char(static_cast<utf8proc_int32_t>(code_point), encoded);
     out.append(reinterpret_cast<const char*>(encoded), static_cast<std::size_t>(encoded_len));
+    return out;
 }
 
 bool UnicodeNormalizer::is_regional_indicator(char32_t code_point) {
@@ -251,7 +260,7 @@ bool UnicodeNormalizer::is_regional_indicator_at(std::string_view text, std::ptr
     return len == 4 && is_regional_indicator(static_cast<char32_t>(code_point));
 }
 
-char32_t UnicodeNormalizer::last_code_point(const std::string& text) {
+char32_t UnicodeNormalizer::last_code_point(std::string_view text) {
     std::size_t start = text.size();
     while (start > 0 && text.size() - start < 4) {
         --start;
@@ -276,4 +285,45 @@ char UnicodeNormalizer::lower_ascii(char c) {
         return static_cast<char>(c - 'A' + 'a');
     }
     return c;
+}
+
+UnicodeNormalizer::OutputBuffer::OutputBuffer(std::string& storage, std::size_t capacity)
+    : storage(&storage), data(nullptr), used(0), capacity(capacity) {
+    storage.resize(capacity);
+    data = storage.data();
+}
+
+void UnicodeNormalizer::OutputBuffer::push_back(char c) {
+    if (used == capacity) [[unlikely]] {
+        data = grow(*storage, used + 1);
+        capacity = storage->size();
+    }
+    data[used] = c;
+    ++used;
+}
+
+void UnicodeNormalizer::OutputBuffer::append(const char* bytes, std::size_t count) {
+    if (capacity - used < count) [[unlikely]] {
+        data = grow(*storage, used + count);
+        capacity = storage->size();
+    }
+    std::memcpy(data + used, bytes, count);
+    used += count;
+}
+
+std::size_t UnicodeNormalizer::OutputBuffer::size() const {
+    return used;
+}
+
+std::string_view UnicodeNormalizer::OutputBuffer::view() const {
+    return std::string_view(data, used);
+}
+
+void UnicodeNormalizer::OutputBuffer::finish() {
+    storage->resize(used);
+}
+
+char* UnicodeNormalizer::OutputBuffer::grow(std::string& storage, std::size_t needed) {
+    storage.resize(std::max(storage.size() * 2, needed));
+    return storage.data();
 }
